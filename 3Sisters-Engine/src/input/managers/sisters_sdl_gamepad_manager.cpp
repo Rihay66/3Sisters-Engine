@@ -1,6 +1,6 @@
-#include "SDL3/SDL_gamepad.h"
 #include <input/managers/sisters_sdl_gamepad_manager.hpp>
 
+#include <cstdint>
 #include <cstdlib>
 #include <SDL3/SDL.h>
 
@@ -91,14 +91,14 @@ void GamepadManager::enableGamepad(int jid){
     // create a new gamepad using the given JID
     SDL_Gamepad* gamepad = SDL_OpenGamepad(jid);
     
-    std::cout << "Enabling controller at: " << jid << "\n";
+    //std::cout << "Enabling controller at: " << jid << "\n";
 
     // set pad into the queried and then set pads according to priority
     
-    // find the lowest priority number, meaning they are high priority to be set
+    // find the lowest number, meaning they are high priority to be set
     int priority = 0;
     for(QueuedGamepad& pads : queuedGamepads){
-        if(pads.gamepad->device == nullptr && pads.priority > priority){
+        if(pads.gamepad->device == nullptr && pads.priority < priority){
             priority = pads.priority;
         }
     }
@@ -108,13 +108,13 @@ void GamepadManager::enableGamepad(int jid){
         if(pads.priority == priority){
             pads.gamepad->device = gamepad;
             pads.gamepad->isConnected = true;
-            std::cout << "Gamepad set\n";
+            //std::cout << "Gamepad set\n";
         }
     }
 }
 
 void GamepadManager::disableGamepad(int jid){
-    std::cout << "Closing controller at: " << jid << "\n";
+    //std::cout << "Closing controller at: " << jid << "\n";
     // check for given JID which device was removed and properly close it
     for(QueuedGamepad& pads : queuedGamepads){
         // check if pad is set
