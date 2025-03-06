@@ -1,13 +1,12 @@
 cmake_minimum_required(VERSION 3.28.0)
 set (CMAKE_CXX_STANDARD 20)
-project(3Sisters-Engine-Testing VERSION 0.1.0 LANGUAGES C CXX)
+project(3Sisters-Engine-Testing VERSION 0.0.1 LANGUAGES C CXX)
 cmake_policy(SET CMP0072 NEW)
 
 # Include all files
 file(GLOB_RECURSE SOURCE_FILES
     ${CMAKE_SOURCE_DIR}/test/src/*.c
     ${CMAKE_SOURCE_DIR}/test/src/*.cpp
-    ${CMAKE_SOURCE_DIR}/test/*.cpp
 )
 
 file(GLOB_RECURSE HEADER_FILES

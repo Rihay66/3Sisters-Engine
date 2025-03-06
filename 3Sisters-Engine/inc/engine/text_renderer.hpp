@@ -29,7 +29,7 @@ class TextRenderer{
         /* used to draw text on the screen using a loaded font
             @ Recommended to use a font loaded through from the ResourceManager
         */ 
-        static void DrawText(std::map<char, Character>& chars, std::string text, glm::vec2 position, glm::vec2 scale, glm::vec4 color = glm::vec4(1.0f));
+        static void DrawString(std::map<char, Character>& chars, std::string text, glm::vec2 position, glm::vec2 scale, glm::vec4 color = glm::vec4(1.0f));
     
     private:
         // stores data of a quad

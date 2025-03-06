@@ -1,4 +1,3 @@
-#include <GLES2/gl2.h>
 #include <engine/text_renderer.hpp>
 
 // additional GLM libraries
@@ -45,7 +44,7 @@ void TextRenderer::Init(Shader& shader){
     initTextRenderingData();
 }
 
-void TextRenderer::DrawText(std::map<char, Character>& chars, std::string text, glm::vec2 position, glm::vec2 scale, glm::vec4 color){
+void TextRenderer::DrawString(std::map<char, Character>& chars, std::string text, glm::vec2 position, glm::vec2 scale, glm::vec4 color){
     // check if the text renderer has been set  
     if(!isAutoClearSet){
         std::cout << "ERROR: Missing text render data initialization!\n";

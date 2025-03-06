@@ -72,7 +72,7 @@ void GamepadManager::SetGamepad(Gamepad& gamepad, int index){
     }
 }
 
-void GamepadManager::PollInputs(){    
+void GamepadManager::PollIO(){    
     // check that GLFW has not been initialized
     if(glfwGetError(NULL) == GLFW_NOT_INITIALIZED){
         std::cout << "ERROR: GLFW is not initialized!\n";

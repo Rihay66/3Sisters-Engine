@@ -168,33 +168,6 @@ void SpriteRenderer::DrawQuad(int texIndex, glm::vec2 pos, glm::vec2 size, float
     FlushQuads();
 }
 
-void SpriteRenderer::DrawQuad(int texIndex, Interpolation inter, glm::vec2 size, float rot, double alpha, glm::vec4 color, const std::array<glm::vec2, 4> texCoords ,const glm::vec4 vertexPositions[]){
-    //? check if buffer hasn't been set up
-    if(quadBuffer == nullptr){
-        //! Display error
-        std::cout << "ERROR: Missing render quad buffer initialization!\n";
-        return; // stop function
-    }
-
-    // init the buffer
-    beginQuadBatch();
-
-    // create interpolation storage
-    State interpolation;
-
-    // calculate interpolation
-    interpolateState(interpolation, alpha, inter.previous, inter.current);
-
-    // create a vector contain position according to the interpolation
-    glm::vec2 pos = glm::vec2(interpolation.posX, interpolation.posY);
-
-    // create the quad to render
-    createQuad(pos, size, rot, texIndex, color, texCoords, vertexPositions);
-
-    // render
-    FlushQuads();
-}
-
 void SpriteRenderer::DrawLine(glm::vec2 p0, glm::vec2 p1, glm::vec4 color){
     //? check if buffer hasn't been set up
     if(lineBuffer == nullptr){
@@ -265,35 +238,6 @@ void SpriteRenderer::StackQuad(int texIndex, glm::vec2 pos, glm::vec2 size, floa
     }
 
     // if not then add a quad to the buffer pointer
-
-    // create the quad to render
-    createQuad(pos, size, rot, texIndex, color, texCoords, vertexPositions);
-}
-
-void SpriteRenderer::StackQuad(int texIndex, Interpolation inter, glm::vec2 size, float rot, double alpha, glm::vec4 color, const std::array<glm::vec2, 4> texCoords, const glm::vec4 vertexPositions[]){
-    //? check if buffer hasn't been set up
-    if(quadBuffer == nullptr){
-        //! Display error
-        std::cout << "ERROR: Missing render buffer initialization!\n";
-        return; // stop function
-    }
-
-    // check if the buffer pointer hasn't been set up
-    if(quadBufferPtr == nullptr){
-        // then initialize the batch
-        beginQuadBatch();
-    }
-
-    // if not then add a quad to the buffer pointer
-
-    // create interpolation storage
-    State interpolation;
-
-    // calculate interpolation
-    interpolateState(interpolation, alpha, inter.previous, inter.current);
-
-    // create a vector contain position according to the interpolation
-    glm::vec2 pos = glm::vec2(interpolation.posX, interpolation.posY);
 
     // create the quad to render
     createQuad(pos, size, rot, texIndex, color, texCoords, vertexPositions);

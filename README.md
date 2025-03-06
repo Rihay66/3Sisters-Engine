@@ -4,14 +4,14 @@ A Lightweight 2D OpenGL based Engine called:
 
 ![](3Sisters_Engine_logo.png)
 
-Current Version: 1.2-Dev
-
+Current Version: 1.2
 Features:
 
 * Cross-platform building (Windows & Unix/Linux)
 * Batch Rendering solution
 * OpenAL-based sound engine
 * Entity Component System
+* SDL2 and GLFW3 options
 * Controller-Support
 
 What's Coming?
@@ -21,8 +21,6 @@ What's Coming?
 [] Unit Testing 
 
 [] Setup scripts 
-
-[] SDL2 and GLFW3 options
 
 [] Cross-platform development environments (Only Windows and Unix/Linux)
 

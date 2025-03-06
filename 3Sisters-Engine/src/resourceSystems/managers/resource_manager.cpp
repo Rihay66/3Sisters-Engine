@@ -1,4 +1,3 @@
-#include <GLES2/gl2.h>
 #include <resourceSystems/managers/resource_manager.hpp>
 
 #include <cstring>

@@ -12,6 +12,7 @@
 
 //TODO: Add debug options to display info of the gamepads
 
+namespace GLFW{
 /* A static singleton GamepadManager class that hosts 
  several functions to query for connected or disconnected 
  Gamepads. Each obtained connected controller are stored for
@@ -39,7 +40,7 @@ class GamepadManager{
 
         /* polls input from the connected gamepads to allow for checking for inputs
         */
-        static void PollInputs();
+        static void PollIO();
 
     private:
         // define a queued gamepad that needs to be set
@@ -81,5 +82,6 @@ class GamepadManager{
         // set up automatic de-allocation of loaded resources
         static void setUpAutoClear();
 };
+}
 
 #endif

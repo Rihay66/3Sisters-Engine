@@ -1,4 +1,4 @@
-#include "inc/test_window.hpp"
+#include "../inc/test_window.hpp"
 #include <iostream>
 
 int main(int argc, char* argv[]){

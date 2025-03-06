@@ -4,11 +4,11 @@
 
 using namespace SDL;
 
-bool SDL::getButtonInput(Gamepad &pad, SDL_GamepadButton key){
+bool SDL::getButtonInput(Gamepad &pad, int key){
     // check if gamepad is set and connected
-    if(pad.device != nullptr && pad.device->isConnected){
+    if(pad.device != nullptr && pad.isConnected){
         // check state of given key
-        if(SDL_GetGamepadButton(pad.device->controller, key) > 0){
+        if(SDL_GetGamepadButton(pad.device, (SDL_GamepadButton)key) > 0){
             return true;
         }
     }
@@ -16,11 +16,11 @@ bool SDL::getButtonInput(Gamepad &pad, SDL_GamepadButton key){
     return false;
 }
 
-float SDL::getAxisRawInput(Gamepad &pad, SDL_GamepadAxis axis, float deadzone){
+float SDL::getAxisRawInput(Gamepad &pad, int axis, float deadzone){
     // check if gamepad is set and connected
-    if(pad.device != nullptr && pad.device->isConnected){
+    if(pad.device != nullptr && pad.isConnected){
         // grab current value
-        float input = (float)SDL_GetGamepadAxis(pad.device->controller, axis) / (float)INT16_MAX;
+        float input = (float)SDL_GetGamepadAxis(pad.device, (SDL_GamepadAxis)axis) / (float)INT16_MAX;
         // check state of given key
         if(input > deadzone){
             return input;
@@ -32,11 +32,11 @@ float SDL::getAxisRawInput(Gamepad &pad, SDL_GamepadAxis axis, float deadzone){
     return 0.0f;
 }
 
-float SDL::getAxisInput(Gamepad &pad, SDL_GamepadAxis axis, float deadzone){
+float SDL::getAxisInput(Gamepad &pad, int axis, float deadzone){
     // check if gamepad is set and connected
-    if(pad.device != nullptr && pad.device->isConnected){
+    if(pad.device != nullptr && pad.isConnected){
         // grab current value
-        float input = (float)SDL_GetGamepadAxis(pad.device->controller, axis) / (float)INT16_MAX;
+        float input = (float)SDL_GetGamepadAxis(pad.device, (SDL_GamepadAxis)axis) / (float)INT16_MAX;
         // check state of given key
         if(input > deadzone){
             return 1.0f;
