@@ -27,8 +27,7 @@ set(CAMERAS
 set(RESOURCESYS
     src/resourceSystems/resource_shader.cpp
     src/resourceSystems/resource_texture.cpp
-    src/resourceSystems/managers/resource_manager.cpp
-    src/resourceSystems/managers/tag_manager.cpp)
+    src/resourceSystems/managers/resource_manager.cpp)
 
 set(ECS 
     src/ecs/ecs.cpp

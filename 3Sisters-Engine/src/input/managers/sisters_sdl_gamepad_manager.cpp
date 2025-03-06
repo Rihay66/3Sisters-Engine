@@ -1,6 +1,5 @@
 #include <input/managers/sisters_sdl_gamepad_manager.hpp>
 
-#include <cstdint>
 #include <cstdlib>
 #include <SDL3/SDL.h>
 

@@ -50,7 +50,6 @@ void TestWindow::init(){
     // register components
     ECS::RegisterComponent<Transform2D>();
     ECS::RegisterComponent<Material2D>();
-    ECS::RegisterComponent<Interpolation>();
     ECS::RegisterComponent<Gamepad>();
 
     // register systems
