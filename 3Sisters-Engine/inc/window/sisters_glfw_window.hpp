@@ -26,7 +26,7 @@ class Window{
             alpha = 0, threadSleepTime = 0;
 
         // vars storing and referencing to window size, width x height
-        unsigned int width = 0, height = 0;
+        int width = 0, height = 0;
 
         /* Fixed rate that updates the stepUpdate(), adjust accordingly as needed
          @Default value is 16.6ms

@@ -172,6 +172,9 @@ void Window::runtime(){
 
         // check for glfw events
         glfwPollEvents();
+
+        // gran current window size
+        glfwGetWindowSize((GLFWwindow*)handle, &width, &height);
         
         //  accumulate time and do stepUpdate()
         this->accumulator += this->DeltaTime;

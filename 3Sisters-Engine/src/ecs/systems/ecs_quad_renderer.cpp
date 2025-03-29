@@ -1,9 +1,9 @@
-#include <ecs/systems/ecs_sprite_renderer.hpp>
+#include <ecs/systems/ecs_quad_renderer.hpp>
 
 // include standard components
 #include <ecs/default_components.hpp>
 
-void ECS_SpriteRenderer::render(double alpha){
+void ECS_QuadRenderer::render(double alpha){
     // loop through all entities
     for(auto const& entity : entities){
         // grab entity components
@@ -11,9 +11,9 @@ void ECS_SpriteRenderer::render(double alpha){
         auto& material = ECS::GetComponent<Material2D>(entity);
 
         // add to stack
-        SpriteRenderer::StackQuad(material.texIndex, transform.position, transform.size, transform.rotation, material.color, material.texCoords);
+        QuadRenderer::StackQuad(material.texIndex, transform.position, transform.size, transform.rotation, material.color, material.texCoords);
     }
 
     // flush
-    SpriteRenderer::FlushQuads();
+    QuadRenderer::FlushQuads();
 }

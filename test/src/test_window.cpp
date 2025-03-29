@@ -1,8 +1,8 @@
 #include "../inc/test_window.hpp"
-#include "ecs/systems/ecs_sprite_renderer.hpp"
+#include "ecs/systems/ecs_quad_renderer.hpp"
 #include <engine/components/interpolation.hpp>
 #include <resourceSystems/managers/resource_manager.hpp>
-#include <engine/sprite_renderer.hpp>
+#include <engine/quad_renderer.hpp>
 #include <engine/text_renderer.hpp>
 #include <ecs/ecs.hpp>
 #include <ecs/components/material.hpp>
@@ -29,7 +29,7 @@ void TestWindow::init(){
     // load a texture
     ResourceManager::LoadTexture("textures/sisters.png", "sisters");
     // load a font
-    ResourceManager::LoadFontTexture("fonts/November.ttf", 36, "font");
+    ResourceManager::LoadFontTexture("fonts/November.ttf", 24, "font");
     
     // set up camera
     camera.setDimensions(getWidth(), getHeight());
@@ -38,7 +38,7 @@ void TestWindow::init(){
     camera.calculateProjectionView(ResourceManager::GetShader("text"));
 
     // set up renderers
-    SpriteRenderer::Init(ResourceManager::GetShader("quad"), ResourceManager::GetShader("line"), glm::vec2(15.0f), glm::vec2(15.0f));
+    QuadRenderer::Init(ResourceManager::GetShader("quad"));
     TextRenderer::Init(ResourceManager::GetShader("text"));
 
     // initialize gamepad
@@ -53,13 +53,13 @@ void TestWindow::init(){
     ECS::RegisterComponent<Gamepad>();
 
     // register systems
-    ECS::RegisterSystem<ECS_SpriteRenderer>();
+    ECS::RegisterSystem<ECS_QuadRenderer>();
 
     // get reference of the system
-    renderer = ECS::GetSystem<ECS_SpriteRenderer>();
+    renderer = ECS::GetSystem<ECS_QuadRenderer>();
 
     // set signatures to system
-    ECS::SetSystemSignature<ECS_SpriteRenderer>(
+    ECS::SetSystemSignature<ECS_QuadRenderer>(
         ECS::GetComponentType<Transform2D>(),
         ECS::GetComponentType<Material2D>()
     );
@@ -131,6 +131,9 @@ void TestWindow::stepUpdate(double ts){
         // move entity upwards
         pos.position.y += 1.0f * ts;
     }
+
+    //* Update appropriately the camera projection
+    camera.setDimensions(getWidth(), getHeight());
 }
 
 void TestWindow::update(){
@@ -139,6 +142,11 @@ void TestWindow::update(){
 }
 
 void TestWindow::render(double alpha){
+    // recalculate camera projection
+    camera.calculateProjectionView(ResourceManager::GetShader("quad"));
+    camera.calculateProjectionView(ResourceManager::GetShader("line"));
+    camera.calculateProjectionView(ResourceManager::GetShader("text"));
+
     // render background
     glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
@@ -146,16 +154,11 @@ void TestWindow::render(double alpha){
     renderer->render(alpha); 
 
     // test quad renderer
-    SpriteRenderer::StackQuad(ResourceManager::GetTextureIndex("default"), glm::vec2(15.0f), glm::vec2(2.0f), 0.0f, glm::vec4(0.0f, 0.5f, 0.5f, 1.0f));
-    SpriteRenderer::StackQuad(ResourceManager::GetTextureIndex("sisters"), glm::vec2(5.0f), glm::vec2(5.0f), 45.0f);
+    QuadRenderer::StackQuad(ResourceManager::GetTextureIndex("default"), glm::vec2(0.0f), glm::vec2(0.5f), 0.0f, glm::vec4(0.0f, 0.5f, 0.5f, 1.0f));
+    QuadRenderer::StackQuad(ResourceManager::GetTextureIndex("sisters"), glm::vec2(-1.2f, 0.0f), glm::vec2(0.75f), 45.0f);
 
-    SpriteRenderer::FlushQuads();
-
-    SpriteRenderer::DrawQuad(ResourceManager::GetTextureIndex("default"), glm::vec2(40.0f, 20.0f), glm::vec2(10.0f), 0.0f, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-
-    // test line renderer
-    SpriteRenderer::DrawLine(glm::vec2(1.0f), glm::vec2(10.0f));
+    QuadRenderer::FlushQuads();
 
     // render text
-    TextRenderer::DrawString(ResourceManager::GetFontTexture("font"), "HELLO world!", glm::vec2(100.0f, 200.0f), glm::vec2(1.0f));
+    TextRenderer::DrawString(ResourceManager::GetFontTexture("font"), "HI", glm::vec2(0.0f, 0.0f), glm::vec2(0.05f, 0.025f));
 }

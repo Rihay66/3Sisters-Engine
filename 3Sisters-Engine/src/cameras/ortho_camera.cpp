@@ -22,9 +22,11 @@ unsigned int OrthoCamera::getHeight(){
 }
 
 void OrthoCamera::calculateProjectionView(Shader& shader){
+    // calculate aspect ratio
+    float aspect_ratio = (float)width / (float)height;
+
     // create the projection
-    glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(this->width), 
-        0.0f, static_cast<float>(this->height), -1.0f, 1.0f);
+    glm::mat4 projection = glm::ortho(-aspect_ratio, aspect_ratio, -1.0f, 1.0f, -1.0f, 1.0f);
 
     // set up the view by inversing the transform 
     glm::mat4 view = glm::inverse(glm::translate(glm::mat4(1.0f), glm::vec3(this->position.x, this->position.y, 0.0f)) 

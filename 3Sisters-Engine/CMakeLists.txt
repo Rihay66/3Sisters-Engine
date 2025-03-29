@@ -32,7 +32,7 @@ set(RESOURCESYS
 set(ECS 
     src/ecs/ecs.cpp
     src/ecs/managers/entity_manager.cpp
-    src/ecs/systems/ecs_sprite_renderer.cpp)
+    src/ecs/systems/ecs_quad_renderer.cpp)
 
 set(INPUT
     src/input/sisters_sdl_gamepad.cpp
@@ -51,7 +51,8 @@ set(SOUND
     src/sound/managers/sound_manager.cpp)
 
 set(ENGINE 
-    src/engine/sprite_renderer.cpp
+    src/engine/line_renderer.cpp
+    src/engine/quad_renderer.cpp
     src/engine/text_renderer.cpp)
 
 # Create engine as a static library and add source files
