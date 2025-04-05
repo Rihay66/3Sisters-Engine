@@ -1,10 +1,10 @@
 #include "../inc/test_window.hpp"
 #include "ecs/systems/ecs_quad_renderer.hpp"
+#include "engine/text_renderer.hpp"
 #include <engine/components/interpolation.hpp>
 #include <resourceSystems/managers/texture_manager.hpp>
 #include <resourceSystems/managers/shader_manager.hpp>
 #include <engine/quad_renderer.hpp>
-#include <engine/text_renderer.hpp>
 #include <ecs/ecs.hpp>
 #include <ecs/components/material.hpp>
 #include <ecs/components/transform.hpp>
@@ -19,18 +19,18 @@ TestWindow::~TestWindow() {
 
 void TestWindow::init(){  
     // load a quad shader
-    ShaderManager::LoadShader("shaders/quad_es.vs", "shaders/quad_es.frag", nullptr, "quad");
+    ShaderManager::LoadShader("shaders/quad.vert", "shaders/quad.frag", nullptr, "quad");
     // load a line shader
-    ShaderManager::LoadShader("shaders/line_es.vs", "shaders/line_es.frag", nullptr, "line");
+    ShaderManager::LoadShader("shaders/line.vert", "shaders/line.frag", nullptr, "line");
     // load a text shader
-    ShaderManager::LoadShader("shaders/text_es.vs", "shaders/text_es.frag", nullptr, "text");
+    ShaderManager::LoadShader("shaders/text.vert", "shaders/text.frag", nullptr, "text");
     
     // generate white texture
     TextureManager::GenerateWhiteTexture();
     // load a texture
     TextureManager::LoadTexture("textures/sisters.png", "sisters");
     // load a font
-    TextureManager::LoadFontTexture("fonts/November.ttf", 24, "font");
+    TextureManager::LoadFontTexture("fonts/November.ttf", "font", 512,  512, 64.0f, false);
     
     // set up camera
     camera.setDimensions(getWidth(), getHeight());
@@ -40,8 +40,8 @@ void TestWindow::init(){
 
     // set up renderers
     QuadRenderer::Init(ShaderManager::GetShader("quad"));
-    TextRenderer::Init(ShaderManager::GetShader("text"));
-
+    TextRenderer::Init(ShaderManager::GetShader("text"), getHeight());
+    
     // initialize gamepad
     GamepadManager::InitializeQuery(getEventState());
 
@@ -152,14 +152,16 @@ void TestWindow::render(double alpha){
     glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
     // test ECS quad renderer system
-    renderer->render(alpha); 
+    //renderer->render(alpha); 
 
     // test quad renderer
     QuadRenderer::StackQuad(TextureManager::GetTextureIndex("default"), glm::vec2(0.0f), glm::vec2(0.5f), 0.0f, glm::vec4(0.0f, 0.5f, 0.5f, 1.0f));
     QuadRenderer::StackQuad(TextureManager::GetTextureIndex("sisters"), glm::vec2(-1.2f, 0.0f), glm::vec2(0.75f), 45.0f);
 
     QuadRenderer::FlushQuads();
-
-    // render text
-    TextRenderer::DrawString(TextureManager::GetFontTexture("font"), "HI", glm::vec2(0.0f, 0.0f), glm::vec2(0.05f, 0.025f));
+    
+    // test text renderer
+    TextRenderer::StackCharacters(TextureManager::GetFontTexture("font"), "Hello World", glm::vec3(0.0f, 0.5f, 0.0f), 1.0f, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+    TextRenderer::StackCharacters(TextureManager::GetFontTexture("font"), "Hi\nBye", glm::vec3(0.0f, 0.0f, 0.0f), 1.0f);
+    TextRenderer::FlushText();
 }

@@ -73,7 +73,7 @@ void QuadRenderer::DrawQuad(int texIndex, glm::vec2 pos, glm::vec2 size, float r
     //? check if buffer hasn't been set up
     if(quadBuffer == nullptr){
         //! Display error
-        std::cout << "ERROR: Missing render quad buffer initialization!\n";
+        std::cout << "ERROR: Missing quad render quad buffer initialization!\n";
         return; // stop function
     }
 
@@ -91,7 +91,7 @@ void QuadRenderer::StackQuad(int texIndex, glm::vec2 pos, glm::vec2 size, float 
     //? check if buffer hasn't been set up
     if(quadBuffer == nullptr){
         //! Display error
-        std::cout << "ERROR: Missing render buffer initialization!\n";
+        std::cout << "ERROR: Missing quad render buffer initialization!\n";
         return; // stop function
     }
 
@@ -111,7 +111,7 @@ void QuadRenderer::FlushQuads(){
     //? check if buffer hasn't been set up
     if(quadBuffer == nullptr){
         //! Display error
-        std::cout << "ERROR: Missing render buffer initialization!\n";
+        std::cout << "ERROR: Missing quad render buffer initialization!\n";
         return; // stop function
     }
 
@@ -179,7 +179,7 @@ void QuadRenderer::createQuad(glm::vec2& pos, glm::vec2& size, float& rotation, 
 void QuadRenderer::initQuadRenderData(){
     // check if quad buffer had already been initialized
     if (quadBuffer != nullptr)
-        exit(-1); // avoid re-initalize the render data
+        exit(-1); // avoid re-initalize of the render data
 
     // configure buffer
     quadBuffer = new QuadVertex[maxQuadVertexCount];

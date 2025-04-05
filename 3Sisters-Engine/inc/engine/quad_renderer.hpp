@@ -20,7 +20,6 @@
  batch rendering when rendering a stack of 2D render primatives. 
  All functions and resources are static and no public 
  constructor is defined.  
- !Requires a shader class and a standard sprite size 
 */
 class QuadRenderer{    
     public:
@@ -60,7 +59,7 @@ class QuadRenderer{
             glm::vec4 color;
         };
 
-        // stores data of a passed in quad shader
+        // storage of the quad shader
         static Shader quadShader;
 
         // stores data of a quad
@@ -94,6 +93,7 @@ class QuadRenderer{
 
         // used to add a quad and be stored in to the quad buffer 
         static void createQuad(glm::vec2& position, glm::vec2& size, float& rotation, int& texIndex, glm::vec4& color, std::array<glm::vec2, 4> texCoords, const glm::vec4 vertexPositions[]);
+        
         //* Batch functions
 
         // used to set the quad vertex buffers

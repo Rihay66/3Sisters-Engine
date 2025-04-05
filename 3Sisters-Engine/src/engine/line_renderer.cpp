@@ -67,7 +67,7 @@ void LineRenderer::DrawQuadWire(glm::vec2 position, glm::vec2 size, float rotati
     //? check if buffer hasn't been set up
     if(lineBuffer == nullptr){
         //! Display error
-        std::cout << "ERROR: Missing render line buffer initialization!\n";
+        std::cout << "ERROR: Missing line render buffer initialization!\n";
         return; // stop function
     }
 
@@ -104,7 +104,7 @@ void LineRenderer::StackLine(glm::vec2 p0, glm::vec2 p1, glm::vec4 color){
     //? check if buffer hasn't been set up
     if(lineBuffer == nullptr){
         //! Display error
-        std::cout << "ERROR: Missing render line buffer initialization!\n";
+        std::cout << "ERROR: Missing line render buffer initialization!\n";
         return; // stop function
     }
 
@@ -126,7 +126,7 @@ void LineRenderer::FlushLines(){
     //? check if buffer hasn't been set up
     if(lineBuffer == nullptr){
         //! Display error
-        std::cout << "ERROR: Missing render line buffer initialization!\n";
+        std::cout << "ERROR: Missing line render buffer initialization!\n";
         return; // stop function
     }
 

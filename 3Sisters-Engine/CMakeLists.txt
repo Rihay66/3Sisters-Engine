@@ -19,7 +19,9 @@ set(WINDOW
     src/window/sisters_sdl_window.cpp)
 
 set(STB 
-    src/stb/stb_image.cpp)
+    src/stb/stb_image.cpp
+    src/stb/stb_truetype.cpp
+    src/stb/stb_image_write.cpp)
 
 set(CAMERAS 
     src/cameras/ortho_camera.cpp)

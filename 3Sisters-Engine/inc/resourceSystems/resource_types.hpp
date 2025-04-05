@@ -9,12 +9,19 @@
 // include GLM
 #include <glm/glm.hpp>
 
-// holds all state information relevant to a character as loaded using FreeType
-struct Character {
-    unsigned int TextureID; // ID handle of the glyph texture
-    glm::ivec2 Size;        // size of glyph
-    glm::ivec2 Bearing;     // offset from baseline to left/top of glyph
-    unsigned int Advance;   // horizontal offset to advance to next glyph
+// include stb_truetype
+#include <stb/stb_truetype.h>
+
+// Font Atlas settings:
+const uint32_t codePointOfFirstChar = 32;      // ASCII of ' '(Space)
+const uint32_t charsToIncludeInFontAtlas = 95; // Include 95 charecters
+
+// holds font data required for rendering characters
+struct CharacterSet{
+    stbtt_packedchar packedChars[charsToIncludeInFontAtlas];
+    stbtt_aligned_quad alignedQuads[charsToIncludeInFontAtlas];
+    unsigned int texID;
+    float fontSize;
 };
 
 // define a sub texture that contains oordinates of a specific texture

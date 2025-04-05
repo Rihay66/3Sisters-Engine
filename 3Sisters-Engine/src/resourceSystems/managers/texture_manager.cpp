@@ -1,26 +1,21 @@
+#include "glad/glad.h"
+#include <cstdint>
 #include <resourceSystems/managers/texture_manager.hpp>
 
 #include <cstring>
 #include <array>
 #include <iostream>
-#include <sstream>
 #include <fstream>
 
-// check platform and then grab the Freetype library
-#ifdef __unix__ // Linux/Unix platform
-    #include <freetype2/ft2build.h>
-    #include FT_FREETYPE_H
-#elif defined(_WIN32) || defined(WIN32) // Windows platform
-    #include <ft2build.h>
-    #include FT_FREETYPE_H
-#endif
-
+// include STB headers
+#include <stb/stb_truetype.h>
+#include <stb/stb_image_write.h>
 #include <stb/stb_image.h>
 
 // instantiate static variables
 
 std::map<std::string, Texture>                                              TextureManager::Textures;
-std::map<std::string, std::map<char, Character>>                            TextureManager::Fonts;
+std::map<std::string, CharacterSet>                                         TextureManager::Fonts;
 std::map<std::string, SubTexture>                                           TextureManager::SubTextures;
 std::vector<unsigned int>                                                   TextureManager::texIDList;
 bool                                                                        TextureManager::doesWhiteTexExist = false;
@@ -71,131 +66,70 @@ Texture& TextureManager::LoadTexture(const char *file, std::string name, bool is
     return Textures[name];
 }
 
-std::map<char, Character>& TextureManager::LoadFontTexture(const char* filename, unsigned int fontsize, std::string name, bool isLinear){
-    // set up automatic clear()
+CharacterSet& TextureManager::LoadFontTexture(const char *file, std::string name, uint32_t fontAtlasWidth, uint32_t fontAtlasHeight,  float fontSize, bool isLinear){
+    // set up auto clear
     setUpAutoClear();
-
-    // use free type to load font and set font size
-
-    // initialize the FreeType2 library
-    FT_Library ft;
-    // grab and check for errors
-    FT_Error error = FT_Init_FreeType(&ft);
-	if (error){
-        std::cout << "ERROR: Couldn't load Freetype | Error: " << error << std::endl;
-	}
-
-    // load the font
-    FT_Face face;
-    // grab and check for errors
-    error = FT_New_Face(ft, filename, 0, &face);
-	if (error){
-		std::cout << "ERROR: Couldn't load Font | Error: " << error << std::endl;
-	}
-
-    // set font size
-    FT_Set_Pixel_Sizes(face, 0, fontsize);
-    // disable byte-alignment restriction
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-    // create font map
-    std::map<char, Character> Characters;
-
-    // load first 128 characters of ASCII set
-    for (unsigned char c = 0; c < 128; c++){
-        // load character glyph
-        if (FT_Load_Char(face, c, FT_LOAD_RENDER)){
-            std::cout << "ERROR::FREETYTPE: Failed to load Glyph\n";
-            continue;
-        }
-
-        unsigned int texture;
-        // check opengl version
-        if(GLAD_GL_VERSION_4_5){
-            // generate texture
-            glCreateTextures(GL_TEXTURE_2D, 1, &texture);
-            
-            glTextureStorage2D(texture, 1, GL_R8, face->glyph->bitmap.width, face->glyph->bitmap.rows);
-            glTextureSubImage2D(texture, 0, 0, 0, face->glyph->bitmap.width, face->glyph->bitmap.rows, GL_RED, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer);
-            
-            // set texture options
-            glTextureParameteri(texture, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTextureParameteri(texture, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     
-            //Check for linear flag then set the texture filter
-            if(isLinear){
-                glTextureParameteri(texture, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTextureParameteri(texture, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            }else{
-                glTextureParameteri(texture, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-                glTextureParameteri(texture, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-            }
-        }else{
-            // generate texture
-            glGenTextures(1, &texture);
-            glBindTexture(GL_TEXTURE_2D, texture);
-            
-            glTexImage2D(
-                GL_TEXTURE_2D,
-                0,
-                GL_RED,
-                face->glyph->bitmap.width,
-                face->glyph->bitmap.rows,
-                0,
-                GL_RED,
-                GL_UNSIGNED_BYTE,
-                face->glyph->bitmap.buffer
-            );
+    // create characters container
+    CharacterSet chars;
+    
+    // load font
+    uint8_t* data = loadFontFromFile(&chars, file, fontAtlasWidth, fontAtlasHeight, fontSize);
+    
+    // check opengl version
+    if(GLAD_GL_VERSION_4_5){
+        // geenrate texture
+        glCreateTextures(GL_TEXTURE_2D, 1, &chars.texID);
+        
+        // create texture for GPU
+        glTextureStorage2D(chars.texID, 1, GL_R8, fontAtlasWidth, fontAtlasHeight);
+        glTextureSubImage2D(chars.texID, 0, 0, 0, fontAtlasWidth, fontAtlasHeight, GL_RED, GL_UNSIGNED_BYTE, data);
+        
+        // set texture options
+        glTextureParameteri(chars.texID, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTextureParameteri(chars.texID, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-            // set texture options
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            
-            //Check for linear flag then set the texture filter
-            if(isLinear){
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            }else{
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-            }
-            
-            // unbind the texture
-            glBindTexture(GL_TEXTURE_2D, 0);
+        //Check for linear flag then set the texture filter
+        if(isLinear){
+            glTextureParameteri(chars.texID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTextureParameteri(chars.texID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        }else{
+            glTextureParameteri(chars.texID, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTextureParameteri(chars.texID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        }
+    }else{
+        // generate ID
+        glGenTextures(1, &chars.texID);
+        // bind texture
+        glBindTexture(GL_TEXTURE_2D, chars.texID);
+        // create texture for GPU
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, fontAtlasWidth, fontAtlasHeight, 0, GL_RED, GL_UNSIGNED_BYTE, data);
+        
+        // set texture parameters
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        // check for filter option
+        if(isLinear){
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        }else{
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         }
         
-        // now store character for later use
-        Character character = {
-            texture,
-            glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
-            glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
-            static_cast<unsigned int>(face->glyph->advance.x)};
-        Characters.insert(std::pair<char, Character>(c, character));
-
-        // check for OpenGL errors
-        // check OpenGL errors
-        int errorCode = glGetError();
-        if(errorCode != GL_NO_ERROR && error == GL_INVALID_VALUE){
-            std::cout << "ERROR: An error occured during binding texures | ERROR Code: " << errorCode << std::endl;
-            std::cout << "ERROR: Texture ID: " << texture << " | Failed to be created\n";
-            // skip iteration
-            continue;
-        }
+        // unbind texture
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
-
-    // free Freetype resources
-    FT_Done_Face(face);
-    FT_Done_FreeType(ft);
-
-    // add characters to resources
-    Fonts[name] = Characters;
-
+    
+    // add texture to font textures
+    Fonts[name] = chars;
+    
+    // free loaded font data 
+    delete[] data;
+    
     // rebind non-font textures
     BindTextures();
-
-    //TODO: Create debug options for the ResourceManager class to display a console to show any errors or messages
-    //Succesfully managed to load the font
-    //std::cout << "MSG: Text Font loaded succesfully!\n";
+    
     return Fonts[name];
 }
 
@@ -283,11 +217,10 @@ int TextureManager::GetTextureIndex(std::string name){
 }
 
 Texture& TextureManager::GetTexture(std::string name){
-    // check the name for any special characters
     return Textures[name];
 }
 
-std::map<char, Character>& TextureManager::GetFontTexture(std::string name){
+CharacterSet& TextureManager::GetFontTexture(std::string name){
     return Fonts[name];
 }
 
@@ -296,7 +229,6 @@ std::array<glm::vec2, 4>& TextureManager::GetSubTexture(std::string name){
 }
 
 bool TextureManager::BindTextures(){
-
     // check if the texure list is not zero
     if(texIDList.size() <= 0){
         std::cout << "ERROR: No textures were loaded!" << std::endl;
@@ -372,15 +304,94 @@ Texture TextureManager::loadTextureFromFile(const char *file, bool alpha, bool i
     return texture;
 }
 
+uint8_t* TextureManager::loadFontFromFile(CharacterSet* chars, const char* file, uint32_t fontAtlasWidth, uint32_t fontAtlasHeight, float fontSize){
+    // load font file
+    std::ifstream inputFileStream(file, std::ios::binary);
+    
+    // find the size of the file to store memory dynamically
+    inputFileStream.seekg(0, std::ios::end);
+    auto&& size = inputFileStream.tellg();
+    inputFileStream.seekg(0, std::ios::beg);
+
+    // allocate the buffer
+    uint8_t* fontDataBuf = new uint8_t[static_cast<size_t>(size)];
+
+    // read the font data to the buffer
+    inputFileStream.read((char*)fontDataBuf, size);
+    
+    //? debug, print out font file info
+    uint32_t fontCount = stbtt_GetNumberOfFonts(fontDataBuf);
+    std::cout << "MSG: Font File: " << file << " contains: " << fontCount << " fonts\n";
+    
+    // initialize stb
+    stbtt_fontinfo fontInfo = {};
+    
+    if(!stbtt_InitFont(&fontInfo, fontDataBuf, 0)){
+        std::cout << "ERROR: Failed to initialize stbtt_InitFont!\n";
+        exit(-1);
+    }
+    
+    // allocate the bitmap texture
+    uint8_t* fontAtlasTextureData = new uint8_t[fontAtlasWidth * fontAtlasHeight];
+    
+    // append font data into the bitmap texture
+    stbtt_pack_context ctx;
+    
+    stbtt_PackBegin(
+        &ctx,                                     // stbtt_pack_context (this call will initialize it) 
+        (unsigned char*)fontAtlasTextureData,     // Font Atlas texture data
+        fontAtlasWidth,                           // Width of the font atlas texture
+        fontAtlasHeight,                          // Height of the font atlas texture
+        0,                                        // Stride in bytes
+        1,                                        // Padding between the glyphs
+        nullptr);
+
+    stbtt_PackFontRange(
+        &ctx,                                     // stbtt_pack_context
+        fontDataBuf,                              // Font Atlas texture data
+        0,                                        // Font Index                                 
+        fontSize,                                 // Size of font in pixels. (Use STBTT_POINT_SIZE(fontSize) to use points) 
+        codePointOfFirstChar,                     // Code point of the first charecter
+        charsToIncludeInFontAtlas,                // No. of charecters to be included in the font atlas 
+        chars->packedChars                    // stbtt_packedchar array, this struct will contain the data to render a glyph
+    );
+    stbtt_PackEnd(&ctx);
+    
+    // store font size on the character set
+    chars->fontSize = fontSize;
+
+    for (int i = 0; i < charsToIncludeInFontAtlas; i++){
+        // define reusable vars
+        float unusedX, unusedY;
+        
+        stbtt_GetPackedQuad(
+            chars->packedChars,              // Array of stbtt_packedchar
+            fontAtlasWidth,                      // Width of the font atlas texture
+            fontAtlasHeight,                     // Height of the font atlas texture
+            i,                                   // Index of the glyph
+            &unusedX, &unusedY,                  // current position of the glyph in screen pixel coordinates, (not required as we have a different corrdinate system)
+            &chars->alignedQuads[i],         // stbtt_alligned_quad struct. (this struct mainly consists of the texture coordinates)
+            0                                    // Allign X and Y position to a integer (doesn't matter because we are not using 'unusedX' and 'unusedY')
+        );
+    }
+
+    // free any memory        
+    delete[] fontDataBuf;
+    
+    //? debug, create an PNG image file of the font
+    //stbi_write_png("fontAtlas.png", fontAtlasWidth, fontAtlasHeight, 1, fontAtlasTextureData, fontAtlasWidth);
+    
+    // return texture data
+    return fontAtlasTextureData;
+}
+
 void TextureManager::clear(){
     // (properly) delete all textures
     for (auto iter : Textures)
         glDeleteTextures(1, &iter.second.GetID());
     // (properly) delete all font textures
-    for(auto i : Fonts){
-        for(const auto& x : i.second){
-            glDeleteTextures(1, &x.second.TextureID);
-        }
+    for(auto iter : Fonts){
+        glDeleteTextures(1, &iter.second.texID);
     }
 }
 
