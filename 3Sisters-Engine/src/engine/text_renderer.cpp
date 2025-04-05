@@ -7,8 +7,8 @@
 // standard library for debug outputs
 #include <iostream>
 
-// include ResourceManager
-#include <resourceSystems/managers/resource_manager.hpp>
+// include TextureManager
+#include <resourceSystems/managers/texture_manager.hpp>
 
 // check platform and then grab the Freetype library
 #ifdef __unix__ // Linux/Unix platform
@@ -106,7 +106,7 @@ void TextRenderer::DrawString(std::map<char, Character>& chars, std::string text
     glBindTexture(GL_TEXTURE_2D, 0);
 
     // rebind non-font textures
-    ResourceManager::BindTextures();
+    TextureManager::BindTextures();
 }
 
 void TextRenderer::initTextRenderingData(){

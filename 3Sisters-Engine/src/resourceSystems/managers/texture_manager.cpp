@@ -1,4 +1,4 @@
-#include <resourceSystems/managers/resource_manager.hpp>
+#include <resourceSystems/managers/texture_manager.hpp>
 
 #include <cstring>
 #include <array>
@@ -19,24 +19,14 @@
 
 // instantiate static variables
 
-std::map<std::string, Shader>                                               ResourceManager::Shaders;
-std::map<std::string, Texture>                                              ResourceManager::Textures;
-std::map<std::string, std::map<char, Character>>                            ResourceManager::Fonts;
-std::map<std::string, SubTexture>                                           ResourceManager::SubTextures;
-std::vector<unsigned int>                                                   ResourceManager::texIDList;
-bool                                                                        ResourceManager::doesWhiteTexExist = false;
-bool                                                                        ResourceManager::isAutoClearSet = false;
+std::map<std::string, Texture>                                              TextureManager::Textures;
+std::map<std::string, std::map<char, Character>>                            TextureManager::Fonts;
+std::map<std::string, SubTexture>                                           TextureManager::SubTextures;
+std::vector<unsigned int>                                                   TextureManager::texIDList;
+bool                                                                        TextureManager::doesWhiteTexExist = false;
+bool                                                                        TextureManager::isAutoClearSet = false;
 
-
-Shader& ResourceManager::LoadShader(const char *vShaderFile, const char *fShaderFile, const char *gShaderFile, std::string name){
-    // set up automatic clear()
-    setUpAutoClear();
-    // load the shader from the given file
-    Shaders[name] = loadShaderFromFile(vShaderFile, fShaderFile, gShaderFile);
-    return Shaders[name];
-}
-
-Texture& ResourceManager::LoadTexture(const char *file, std::string name, bool isLinear){
+Texture& TextureManager::LoadTexture(const char *file, std::string name, bool isLinear){
     // set up automatic clear()
     setUpAutoClear();
     // determine the alpha of the file by checking image file extension
@@ -81,7 +71,7 @@ Texture& ResourceManager::LoadTexture(const char *file, std::string name, bool i
     return Textures[name];
 }
 
-std::map<char, Character>& ResourceManager::LoadFontTexture(const char* filename, unsigned int fontsize, std::string name, bool isLinear){
+std::map<char, Character>& TextureManager::LoadFontTexture(const char* filename, unsigned int fontsize, std::string name, bool isLinear){
     // set up automatic clear()
     setUpAutoClear();
 
@@ -209,7 +199,7 @@ std::map<char, Character>& ResourceManager::LoadFontTexture(const char* filename
     return Fonts[name];
 }
 
-std::array<glm::vec2, 4>& ResourceManager::GenerateSubTexture(std::string name, Texture& texture, glm::uvec2 coordinates, glm::uvec2 cellSize, glm::uvec2 spriteSize){
+std::array<glm::vec2, 4>& TextureManager::GenerateSubTexture(std::string name, Texture& texture, glm::uvec2 coordinates, glm::uvec2 cellSize, glm::uvec2 spriteSize){
     //create sub texture
     SubTexture st;
 
@@ -228,7 +218,7 @@ std::array<glm::vec2, 4>& ResourceManager::GenerateSubTexture(std::string name, 
     return SubTextures[name].TexCoords;
 }
 
-void ResourceManager::GenerateWhiteTexture(){
+void TextureManager::GenerateWhiteTexture(){
     if(!doesWhiteTexExist){
         // create white texture
         Texture whiteTexture;
@@ -271,11 +261,7 @@ void ResourceManager::GenerateWhiteTexture(){
     }
 }
 
-Shader& ResourceManager::GetShader(std::string name){
-    return Shaders[name];
-}
-
-int ResourceManager::GetTextureIndex(std::string name){
+int TextureManager::GetTextureIndex(std::string name){
 
     //*NOTE: The check is used to prevent using this function when no texture was binded to OpenGL
     if(texIDList.size() <= 0){
@@ -296,20 +282,20 @@ int ResourceManager::GetTextureIndex(std::string name){
     return -1;
 }
 
-Texture& ResourceManager::GetTexture(std::string name){
+Texture& TextureManager::GetTexture(std::string name){
     // check the name for any special characters
     return Textures[name];
 }
 
-std::map<char, Character>& ResourceManager::GetFontTexture(std::string name){
+std::map<char, Character>& TextureManager::GetFontTexture(std::string name){
     return Fonts[name];
 }
 
-std::array<glm::vec2, 4>& ResourceManager::GetSubTexture(std::string name){
+std::array<glm::vec2, 4>& TextureManager::GetSubTexture(std::string name){
     return SubTextures[name].TexCoords;
 }
 
-bool ResourceManager::BindTextures(){
+bool TextureManager::BindTextures(){
 
     // check if the texure list is not zero
     if(texIDList.size() <= 0){
@@ -343,57 +329,7 @@ bool ResourceManager::BindTextures(){
     return true;
 }
 
-Shader ResourceManager::loadShaderFromFile(const char *vShaderFile, const char *fShaderFile, const char *gShaderFile){
-    // retrieve the vertex/fragment source code from filePath
-    std::string vertexCode;
-    std::string fragmentCode;
-    std::string geometryCode;
-    // create interface objs to get file
-    std::ifstream vertexShaderFile;
-    std::ifstream fragmentShaderFile;
-    try
-    {
-        // open files
-        vertexShaderFile.open(vShaderFile);
-        fragmentShaderFile.open(fShaderFile);
-        std::stringstream vShaderStream, fShaderStream;
-        // read file's buffer contents into streams
-        vShaderStream << vertexShaderFile.rdbuf();
-        fShaderStream << fragmentShaderFile.rdbuf();
-        // close file handlers
-        vertexShaderFile.close();
-        fragmentShaderFile.close();
-        // convert stream into string
-        vertexCode = vShaderStream.str();
-        fragmentCode = fShaderStream.str();
-        // if geometry shader path is present, also load a geometry shader
-        if (gShaderFile != nullptr)
-        {
-            std::ifstream geometryShaderFile(gShaderFile);
-            // ensure the ifstream can throw exceptions
-            geometryShaderFile.exceptions (std::ifstream::failbit | std::ifstream::badbit);
-            std::stringstream gShaderStream;
-            gShaderStream << geometryShaderFile.rdbuf();
-            geometryShaderFile.close();
-            geometryCode = gShaderStream.str();
-        }
-    }
-    catch (std::exception e)
-    {
-        std::cout << "ERROR::SHADER: Failed to read shader files: " << e.what() << std::endl;
-        // exit with error
-        exit(-1);
-    }
-    const char *vShaderCode = vertexCode.c_str();
-    const char *fShaderCode = fragmentCode.c_str();
-    const char *gShaderCode = geometryCode.c_str();
-    // now create shader object from source code
-    Shader shader;
-    shader.Compile(vShaderCode, fShaderCode, gShaderFile != nullptr ? gShaderCode : nullptr);
-    return shader;
-}
-
-Texture ResourceManager::loadTextureFromFile(const char *file, bool alpha, bool isLinear){
+Texture TextureManager::loadTextureFromFile(const char *file, bool alpha, bool isLinear){
     // create texture object
     Texture texture;
     // set alpha
@@ -436,12 +372,7 @@ Texture ResourceManager::loadTextureFromFile(const char *file, bool alpha, bool 
     return texture;
 }
 
-void ResourceManager::clear(){
-    // (properly) delete all shaders
-    for (auto iter : Shaders) {
-        glDeleteProgram(iter.second.getID());
-    }
-
+void TextureManager::clear(){
     // (properly) delete all textures
     for (auto iter : Textures)
         glDeleteTextures(1, &iter.second.GetID());
@@ -453,7 +384,7 @@ void ResourceManager::clear(){
     }
 }
 
-void ResourceManager::setUpAutoClear(){
+void TextureManager::setUpAutoClear(){
     // set up on exit to call the Clear()
     if(!isAutoClearSet && std::atexit(clear) == 0){
         isAutoClearSet = true; // disable calling this function again

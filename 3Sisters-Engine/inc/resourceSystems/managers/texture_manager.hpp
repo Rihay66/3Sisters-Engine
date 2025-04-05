@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef RESOURCE_MANAGER_HPP
-#define RESOURCE_MANAGER_HPP
+#ifndef TEXTURE_MANAGER_HPP
+#define TEXTURE_MANAGER_HPP
 
 // include standard libraries
 #include <map>
@@ -11,25 +11,19 @@
 
 // include necessary classes such as texture and shader classes
 #include <resourceSystems/resource_texture.hpp>
-#include <resourceSystems/resource_shader.hpp>
 
 // include resource definitions
 #include <resourceSystems/resource_types.hpp>
 
-/* A static singleton Resource Manager class that hosts several
- functions to load Textures and Shaders. Each loaded texture
+/* A static singleton Resource Texture Manager class that 
+ hosts several functions to load Textures. Each loaded texture
  and/or shader is also stored for future reference by string
  handles. All functions and resources are static and no
  public constructor is defined.
 */
-class ResourceManager{
+class TextureManager{
     public:
         //* loader functions
-
-        /*  loads (and generates) a shader program from file along with a name, loads the files in this order of vertex, fragment (and geometry) and extracts the shader's source code
-        * @NOTE: it is optional to load a geometry shader file, if there is no geometry shader then set as nullptr
-        */
-        static Shader& LoadShader(const char *vShaderFile, const char *fShaderFile, const char *gShaderFile, std::string name);
 
         /* loads (and generates) a texture from file along with a name and optional texture filter option
         * @NOTE: depending on the file type alpha is automatically set
@@ -49,9 +43,6 @@ class ResourceManager{
         static void GenerateWhiteTexture();
 
         //* getter functions
-
-        // retrieves a stored shader
-        static Shader& GetShader(std::string name);
 
         // retrieves a stored texture's ID index
         static int GetTextureIndex(std::string name);
@@ -73,8 +64,6 @@ class ResourceManager{
         static bool BindTextures();
         
     private:
-        // private resource storage
-        static std::map<std::string, Shader> Shaders;
         //TODO: Switch to use std::array
         static std::map<std::string, Texture> Textures;
         static std::map<std::string, std::map<char, Character>> Fonts;
@@ -84,9 +73,7 @@ class ResourceManager{
         static bool doesWhiteTexExist;
         
         // private constructor, that is we do not want any actual resource manager objects. Its members and functions should be publicly available (static).
-        ResourceManager() {}
-        // loads and generates a shader from file
-        static Shader loadShaderFromFile(const char *vShaderFile, const char *fShaderFile, const char *gShaderFile = nullptr);
+        TextureManager() {}
         // loads a single texture from file
         static Texture loadTextureFromFile(const char *file, bool alpha, bool isLinear);
         // properly de-allocates all loaded resources

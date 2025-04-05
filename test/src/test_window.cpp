@@ -1,7 +1,8 @@
 #include "../inc/test_window.hpp"
 #include "ecs/systems/ecs_quad_renderer.hpp"
 #include <engine/components/interpolation.hpp>
-#include <resourceSystems/managers/resource_manager.hpp>
+#include <resourceSystems/managers/texture_manager.hpp>
+#include <resourceSystems/managers/shader_manager.hpp>
 #include <engine/quad_renderer.hpp>
 #include <engine/text_renderer.hpp>
 #include <ecs/ecs.hpp>
@@ -18,28 +19,28 @@ TestWindow::~TestWindow() {
 
 void TestWindow::init(){  
     // load a quad shader
-    ResourceManager::LoadShader("shaders/quad_es.vs", "shaders/quad_es.frag", nullptr, "quad");
+    ShaderManager::LoadShader("shaders/quad_es.vs", "shaders/quad_es.frag", nullptr, "quad");
     // load a line shader
-    ResourceManager::LoadShader("shaders/line_es.vs", "shaders/line_es.frag", nullptr, "line");
+    ShaderManager::LoadShader("shaders/line_es.vs", "shaders/line_es.frag", nullptr, "line");
     // load a text shader
-    ResourceManager::LoadShader("shaders/text_es.vs", "shaders/text_es.frag", nullptr, "text");
+    ShaderManager::LoadShader("shaders/text_es.vs", "shaders/text_es.frag", nullptr, "text");
     
     // generate white texture
-    ResourceManager::GenerateWhiteTexture();
+    TextureManager::GenerateWhiteTexture();
     // load a texture
-    ResourceManager::LoadTexture("textures/sisters.png", "sisters");
+    TextureManager::LoadTexture("textures/sisters.png", "sisters");
     // load a font
-    ResourceManager::LoadFontTexture("fonts/November.ttf", 24, "font");
+    TextureManager::LoadFontTexture("fonts/November.ttf", 24, "font");
     
     // set up camera
     camera.setDimensions(getWidth(), getHeight());
-    camera.calculateProjectionView(ResourceManager::GetShader("quad"));
-    camera.calculateProjectionView(ResourceManager::GetShader("line"));
-    camera.calculateProjectionView(ResourceManager::GetShader("text"));
+    camera.calculateProjectionView(ShaderManager::GetShader("quad"));
+    camera.calculateProjectionView(ShaderManager::GetShader("line"));
+    camera.calculateProjectionView(ShaderManager::GetShader("text"));
 
     // set up renderers
-    QuadRenderer::Init(ResourceManager::GetShader("quad"));
-    TextRenderer::Init(ResourceManager::GetShader("text"));
+    QuadRenderer::Init(ShaderManager::GetShader("quad"));
+    TextRenderer::Init(ShaderManager::GetShader("text"));
 
     // initialize gamepad
     GamepadManager::InitializeQuery(getEventState());
@@ -74,7 +75,7 @@ void TestWindow::init(){
         .size = {1.5f, 1.5f}
     },
     Material2D{
-        .texIndex = ResourceManager::GetTextureIndex("default"),
+        .texIndex = TextureManager::GetTextureIndex("default"),
         .color = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)
     },
     Gamepad{
@@ -92,7 +93,7 @@ void TestWindow::init(){
         .size = {1.5f, 1.5f}
     },
     Material2D{
-        .texIndex = ResourceManager::GetTextureIndex("default"),
+        .texIndex = TextureManager::GetTextureIndex("default"),
         .color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)
     },
     Gamepad{
@@ -143,9 +144,9 @@ void TestWindow::update(){
 
 void TestWindow::render(double alpha){
     // recalculate camera projection
-    camera.calculateProjectionView(ResourceManager::GetShader("quad"));
-    camera.calculateProjectionView(ResourceManager::GetShader("line"));
-    camera.calculateProjectionView(ResourceManager::GetShader("text"));
+    camera.calculateProjectionView(ShaderManager::GetShader("quad"));
+    camera.calculateProjectionView(ShaderManager::GetShader("line"));
+    camera.calculateProjectionView(ShaderManager::GetShader("text"));
 
     // render background
     glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
@@ -154,11 +155,11 @@ void TestWindow::render(double alpha){
     renderer->render(alpha); 
 
     // test quad renderer
-    QuadRenderer::StackQuad(ResourceManager::GetTextureIndex("default"), glm::vec2(0.0f), glm::vec2(0.5f), 0.0f, glm::vec4(0.0f, 0.5f, 0.5f, 1.0f));
-    QuadRenderer::StackQuad(ResourceManager::GetTextureIndex("sisters"), glm::vec2(-1.2f, 0.0f), glm::vec2(0.75f), 45.0f);
+    QuadRenderer::StackQuad(TextureManager::GetTextureIndex("default"), glm::vec2(0.0f), glm::vec2(0.5f), 0.0f, glm::vec4(0.0f, 0.5f, 0.5f, 1.0f));
+    QuadRenderer::StackQuad(TextureManager::GetTextureIndex("sisters"), glm::vec2(-1.2f, 0.0f), glm::vec2(0.75f), 45.0f);
 
     QuadRenderer::FlushQuads();
 
     // render text
-    TextRenderer::DrawString(ResourceManager::GetFontTexture("font"), "HI", glm::vec2(0.0f, 0.0f), glm::vec2(0.05f, 0.025f));
+    TextRenderer::DrawString(TextureManager::GetFontTexture("font"), "HI", glm::vec2(0.0f, 0.0f), glm::vec2(0.05f, 0.025f));
 }
