@@ -133,6 +133,12 @@ float getAxisRawInput(Gamepad& pad, int key, float deadzone = 0.5f);
 */
 float getAxisInput(Gamepad& pad, int key, float deadzone = 0.5f);
 
+/* apply controller rumble to the gamepad, if it supports it
+* @NOTE: Requires a set gamepad
+* @Returns: False if the gamepad doesn't support rumble or isn't connected, and True otherwise
+*/
+bool applyRumble(Gamepad& pad, uint16_t leftIntensity, uint16_t rightIntensity, uint32_t duration_ms);
+
 }
 
 #endif

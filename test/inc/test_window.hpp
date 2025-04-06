@@ -15,7 +15,6 @@ class TestWindow : public Window {
     private:
         OrthoCamera camera;
         ECS_QuadRendererPtr renderer;
-        Entity redEntity;
         Entity greenEntity;
     public:
         TestWindow();

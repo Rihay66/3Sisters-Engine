@@ -47,3 +47,13 @@ float SDL::getAxisInput(Gamepad &pad, int axis, float deadzone){
 
     return 0.0f;
 }
+
+bool SDL::applyRumble(Gamepad &pad, uint16_t leftIntensity, uint16_t rightIntensity, uint32_t duration_ms){
+    // check if gamepad is set and connected
+    if(pad.device != nullptr && pad.isConnected){
+        // apply rumble
+        return SDL_RumbleGamepad(pad.device, leftIntensity, rightIntensity, duration_ms);
+    }
+    
+    return false;
+}

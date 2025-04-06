@@ -1,6 +1,7 @@
 #include "../inc/test_window.hpp"
 #include "ecs/systems/ecs_quad_renderer.hpp"
 #include "engine/text_renderer.hpp"
+#include "input/sisters_sdl_gamepad.hpp"
 #include <engine/components/interpolation.hpp>
 #include <resourceSystems/managers/texture_manager.hpp>
 #include <resourceSystems/managers/shader_manager.hpp>
@@ -70,9 +71,9 @@ void TestWindow::init(){
     // add components to entity
     ECS::AddComponent(greenEntity, 
     Transform2D{
-        .position = {20.0f, 20.0f},
+        .position = {0.6f, -0.5f},
         .rotation = 0.0f,
-        .size = {1.5f, 1.5f}
+        .size = {0.6f, 0.6f}
     },
     Material2D{
         .texIndex = TextureManager::GetTextureIndex("default"),
@@ -83,43 +84,11 @@ void TestWindow::init(){
     }
     );
 
-    // create another entity
-    redEntity = ECS::CreateEntity();
-    // add components to entity
-    ECS::AddComponent(redEntity, 
-    Transform2D{
-        .position = {10.0f, 20.0f},
-        .rotation = 0.0f,
-        .size = {1.5f, 1.5f}
-    },
-    Material2D{
-        .texIndex = TextureManager::GetTextureIndex("default"),
-        .color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)
-    },
-    Gamepad{
-
-    }
-    );
-
     // put gamepad into gamepad manager
     GamepadManager::SetGamepad(ECS::GetComponent<Gamepad>(greenEntity), 0);
-    GamepadManager::SetGamepad(ECS::GetComponent<Gamepad>(redEntity), 1);
 }
 
 void TestWindow::stepUpdate(double ts){
-    // make entity spin
-    auto& redpos = ECS::GetComponent<Transform2D>(redEntity);
-    redpos.rotation += 2.0f;
-
-    // make entity move according to the controller input
-    auto& redgamepad = ECS::GetComponent<Gamepad>(redEntity);
-
-    // check for input
-    if(getButtonInput(redgamepad, PLAYSTATION_BUTTON_CROSS)){
-        // move entity upwards
-        redpos.position.y += 1.0f * ts;
-    }
-
     // make entity spin
     auto& pos = ECS::GetComponent<Transform2D>(greenEntity);
     pos.rotation += 2.0f;
@@ -129,8 +98,8 @@ void TestWindow::stepUpdate(double ts){
 
     // check for input
     if(getButtonInput(gamepad, PLAYSTATION_BUTTON_CROSS)){
-        // move entity upwards
-        pos.position.y += 1.0f * ts;
+        // apply rumble
+        applyRumble(gamepad, 65535, 65535, 1000);
     }
 
     //* Update appropriately the camera projection
@@ -152,7 +121,7 @@ void TestWindow::render(double alpha){
     glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
     // test ECS quad renderer system
-    //renderer->render(alpha); 
+    renderer->render(alpha); 
 
     // test quad renderer
     QuadRenderer::StackQuad(TextureManager::GetTextureIndex("default"), glm::vec2(0.0f), glm::vec2(0.5f), 0.0f, glm::vec4(0.0f, 0.5f, 0.5f, 1.0f));
