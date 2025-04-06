@@ -68,7 +68,6 @@ add_subdirectory(vendor)
 
 # include all dependencies directories
 target_include_directories(3Sisters-Engine PRIVATE
-    vendor/freetype-src/include
     vendor/glfw-src/include
     vendor/glm-src
     vendor/openalsoft-src/include
@@ -77,7 +76,7 @@ target_include_directories(3Sisters-Engine PRIVATE
 )
 
 # include all dependencies
-target_link_libraries(3Sisters-Engine glm glfw freetype SDL3::SDL3-static OpenAL::OpenAL)
+target_link_libraries(3Sisters-Engine glm glfw SDL3::SDL3-static OpenAL::OpenAL)
 
 # Include directory for engine's headers
 set(ENGINE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/inc)
