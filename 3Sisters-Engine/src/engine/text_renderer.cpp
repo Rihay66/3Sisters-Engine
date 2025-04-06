@@ -1,3 +1,4 @@
+#include "glm/ext/matrix_transform.hpp"
 #include <engine/text_renderer.hpp>
 
 // additional GLM libraries
@@ -58,7 +59,7 @@ void TextRenderer::Init(Shader& shader, unsigned int height){
     initTextRenderingData();
 }
 
-void TextRenderer::DrawCharacters(CharacterSet& set, std::string text, glm::vec3 position, float size, glm::vec4 color){
+void TextRenderer::DrawCharacters(CharacterSet& set, std::string text, glm::vec3 position, float rotation, float size, glm::vec4 color){
     //? check if buffer hasn't been set up
     if(characterVertexBuffer == nullptr){
         //! Display error
@@ -80,13 +81,13 @@ void TextRenderer::DrawCharacters(CharacterSet& set, std::string text, glm::vec3
     beginCharacterBatch();
     
     // create the text to render
-    createCharacter(set, text, position, size, color);
+    createCharacter(set, text, position, rotation, size, color);
     
     // render
     FlushText();
 }
 
-void TextRenderer::StackCharacters(CharacterSet &set, std::string text, glm::vec3 position, float size, glm::vec4 color){
+void TextRenderer::StackCharacters(CharacterSet &set, std::string text, glm::vec3 position, float rotation, float size, glm::vec4 color){
     //? check if buffer hasn't been set up
     if(characterVertexBuffer == nullptr){
         //! Display error
@@ -113,7 +114,7 @@ void TextRenderer::StackCharacters(CharacterSet &set, std::string text, glm::vec
     // if not then add characters to the buffer pointer
     
     // create the text to render
-    createCharacter(set, text, position, size, color);
+    createCharacter(set, text, position, rotation, size, color);
 }
 
 void TextRenderer::setWindowHeight(unsigned int height){
@@ -151,7 +152,7 @@ void TextRenderer::FlushText(){
     TextureManager::BindTextures();
 }
 
-void TextRenderer::createCharacter(CharacterSet& set, std::string text, glm::vec3 position, float size, glm::vec4 color){     
+void TextRenderer::createCharacter(CharacterSet& set, std::string text, glm::vec3 position, float rotation, float size, glm::vec4 color){     
     // calculate pixel scale
     float pixelScale = 2.0f / window_height;
     
@@ -198,37 +199,40 @@ void TextRenderer::createCharacter(CharacterSet& set, std::string text, glm::vec
                 { alignedQuad->s1, alignedQuad->t1 },
             };
 
+            // create a transform to allow for rotation
+            glm::mat4 transform = glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0.0f, 0.0f, 1.0f));
+            
             // We need to fill the vertex buffer by 6 vertices to render a quad as we are rendering a quad as 2 triangles
             // The order used is in the 'order' array
             // order = [0, 1, 2, 0, 2, 3] is meant to represent 2 triangles: 
             // one by glyphVertices[0], glyphVertices[1], glyphVertices[2] and one by glyphVertices[0], glyphVertices[2], glyphVertices[3]
             
-            characterVertexBufferPtr->position = glm::vec3(glyphVertices[order[0]], position.z);
+            characterVertexBufferPtr->position = glm::vec4(glyphVertices[order[0]], position.z, 0.0f) * transform;
             characterVertexBufferPtr->color = color;
             characterVertexBufferPtr->texCoords = glyphTextureCoords[order[0]];
             characterVertexBufferPtr++;
             
-            characterVertexBufferPtr->position = glm::vec3(glyphVertices[order[1]], position.z);
+            characterVertexBufferPtr->position = glm::vec4(glyphVertices[order[1]], position.z, 0.0f) * transform;
             characterVertexBufferPtr->color = color;
             characterVertexBufferPtr->texCoords = glyphTextureCoords[order[1]];
             characterVertexBufferPtr++;
             
-            characterVertexBufferPtr->position = glm::vec3(glyphVertices[order[2]], position.z);
+            characterVertexBufferPtr->position = glm::vec4(glyphVertices[order[2]], position.z, 0.0f) * transform; 
             characterVertexBufferPtr->color = color;
             characterVertexBufferPtr->texCoords = glyphTextureCoords[order[2]];
             characterVertexBufferPtr++;
             
-            characterVertexBufferPtr->position = glm::vec3(glyphVertices[order[3]], position.z);
+            characterVertexBufferPtr->position = glm::vec4(glyphVertices[order[3]], position.z, 0.0f) * transform;
             characterVertexBufferPtr->color = color;
             characterVertexBufferPtr->texCoords = glyphTextureCoords[order[3]];
             characterVertexBufferPtr++;
             
-            characterVertexBufferPtr->position = glm::vec3(glyphVertices[order[4]], position.z);
+            characterVertexBufferPtr->position = glm::vec4(glyphVertices[order[4]], position.z, 0.0f) * transform;
             characterVertexBufferPtr->color = color;
             characterVertexBufferPtr->texCoords = glyphTextureCoords[order[4]];
             characterVertexBufferPtr++;
             
-            characterVertexBufferPtr->position = glm::vec3(glyphVertices[order[5]], position.z);
+            characterVertexBufferPtr->position = glm::vec4(glyphVertices[order[5]], position.z, 0.0f) * transform;
             characterVertexBufferPtr->color = color;
             characterVertexBufferPtr->texCoords = glyphTextureCoords[order[5]];
             characterVertexBufferPtr++;

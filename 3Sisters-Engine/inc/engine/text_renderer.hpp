@@ -30,7 +30,7 @@ class TextRenderer{
         /* used to draw text on the screen using a loaded font
             @ Recommended to use a CharacterSet loaded through from the ResourceManager
         */ 
-        static void DrawCharacters(CharacterSet& set, std::string text, glm::vec3 position, float size, glm::vec4 color = glm::vec4(1.0f));
+        static void DrawCharacters(CharacterSet& set, std::string text, glm::vec3 position, float rotation, float size, glm::vec4 color = glm::vec4(1.0f));
         
         //* stack render function
         
@@ -38,7 +38,7 @@ class TextRenderer{
             @ Recommended to use a CharacterSet loaded through from the ResourceManager
             !If using multiple fonts, stack and flush for each particular font being used, you can't mix different fonts when stacking
         */
-        static void StackCharacters(CharacterSet& set, std::string text, glm::vec3 position, float size, glm::vec4 color = glm::vec4(1.0f));
+        static void StackCharacters(CharacterSet& set, std::string text, glm::vec3 position, float rotation, float size, glm::vec4 color = glm::vec4(1.0f));
         
         //* setter functions
         
@@ -89,7 +89,7 @@ class TextRenderer{
         
         //* primative craetion functions
         
-        static void createCharacter(CharacterSet& set, std::string text, glm::vec3 position, float size, glm::vec4 color);
+        static void createCharacter(CharacterSet& set, std::string text, glm::vec3 position, float rotation, float size, glm::vec4 color);
         
         //* Batch functions
         

@@ -161,7 +161,7 @@ void TestWindow::render(double alpha){
     QuadRenderer::FlushQuads();
     
     // test text renderer
-    TextRenderer::StackCharacters(TextureManager::GetFontTexture("font"), "Hello World", glm::vec3(0.0f, 0.5f, 0.0f), 1.0f, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-    TextRenderer::StackCharacters(TextureManager::GetFontTexture("font"), "Hi\nBye", glm::vec3(0.0f, 0.0f, 0.0f), 1.0f);
+    TextRenderer::StackCharacters(TextureManager::GetFontTexture("font"), "Hello World", glm::vec3(0.0f, 0.5f, 0.0f), 45.0f, 1.0f, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+    TextRenderer::StackCharacters(TextureManager::GetFontTexture("font"), "Hi\nBye", glm::vec3(0.0f, 0.0f, 0.0f), 0.0f, 1.0f);
     TextRenderer::FlushText();
 }
