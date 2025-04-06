@@ -1,6 +1,3 @@
-#include "glad/glad.h"
-#include "resourceSystems/resource_types.hpp"
-#include <cstddef>
 #include <engine/text_renderer.hpp>
 
 // additional GLM libraries
@@ -11,6 +8,9 @@
 
 // include TextureManager
 #include <resourceSystems/managers/texture_manager.hpp>
+
+
+#include <cstddef>
 
 // initialize static variables
 const int TextRenderer::order[6] = { 0, 1, 2, 0, 2, 3 }; 

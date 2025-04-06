@@ -1,11 +1,10 @@
-#include "glad/glad.h"
-#include <cstdint>
 #include <resourceSystems/managers/texture_manager.hpp>
 
 #include <cstring>
 #include <array>
 #include <iostream>
 #include <fstream>
+#include <cstdint>
 
 // include STB headers
 #include <stb/stb_truetype.h>
@@ -320,8 +319,8 @@ uint8_t* TextureManager::loadFontFromFile(CharacterSet* chars, const char* file,
     inputFileStream.read((char*)fontDataBuf, size);
     
     //? debug, print out font file info
-    uint32_t fontCount = stbtt_GetNumberOfFonts(fontDataBuf);
-    std::cout << "MSG: Font File: " << file << " contains: " << fontCount << " fonts\n";
+    //uint32_t fontCount = stbtt_GetNumberOfFonts(fontDataBuf);
+    //std::cout << "MSG: Font File: " << file << " contains: " << fontCount << " fonts\n";
     
     // initialize stb
     stbtt_fontinfo fontInfo = {};

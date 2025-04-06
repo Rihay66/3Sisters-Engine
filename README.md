@@ -4,7 +4,7 @@ A Lightweight 2D OpenGL based Engine called:
 
 ![](3Sisters_Engine_logo.png)
 
-Current Version: 1.2
+Current Version: 1.3-Dev
 Features:
 
 * Cross-platform building (Windows & Unix/Linux)
