@@ -15,7 +15,7 @@
  function to load, retrieve, and store sounds. It also handles
  initializing the sound device to enable playing sounds. 
  Each loaded sound is also stored for future reference 
- by string handles. All functions and resources are static 
+ by string reference. All functions and resources are static 
  and no public constructor is defined.  
 */
 class SoundManager{

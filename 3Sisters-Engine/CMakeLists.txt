@@ -34,8 +34,7 @@ set(RESOURCESYS
 
 set(ECS 
     src/ecs/ecs.cpp
-    src/ecs/managers/entity_manager.cpp
-    src/ecs/systems/ecs_quad_renderer.cpp)
+    src/ecs/managers/entity_manager.cpp)
 
 set(INPUT
     src/input/sisters_sdl_gamepad.cpp

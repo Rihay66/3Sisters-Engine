@@ -19,7 +19,6 @@ class SoundDevice{
         ALCdevice* ALCDevice;
         // storage of the context
         ALCcontext* ALCContext;
-
         // storage of sound device name
         std::string deviceName;
 

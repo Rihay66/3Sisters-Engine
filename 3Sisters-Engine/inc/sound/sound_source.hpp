@@ -33,10 +33,10 @@ class SoundSource{
     public:
         //* setter functions
 
-        // sets the pitch of the source, takes in a vlaue within 0.0f to 1.0f
+        // sets the pitch of the source, takes in a value within 0.0f to 1.0f
         void setPitch(float p);
 
-        // sets the gain of the source, takes in a vlaue within 0.0f to 1.0f
+        // sets the gain of the source, takes in a value within 0.0f to 1.0f
         void setGain(float g);
 
         // adds and sets the sound buffer of the source

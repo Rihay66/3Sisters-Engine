@@ -1,14 +1,8 @@
 #include "../inc/test_window.hpp"
-#include "ecs/systems/ecs_quad_renderer.hpp"
 #include "engine/text_renderer.hpp"
-#include "input/sisters_sdl_gamepad.hpp"
-#include <engine/components/interpolation.hpp>
 #include <resourceSystems/managers/texture_manager.hpp>
 #include <resourceSystems/managers/shader_manager.hpp>
 #include <engine/quad_renderer.hpp>
-#include <ecs/ecs.hpp>
-#include <ecs/components/material.hpp>
-#include <ecs/components/transform.hpp>
 
 TestWindow::TestWindow() : Window(){
 
@@ -42,73 +36,15 @@ void TestWindow::init(){
     // set up renderers
     QuadRenderer::Init(ShaderManager::GetShader("quad"));
     TextRenderer::Init(ShaderManager::GetShader("text"), getHeight());
-    
-    // initialize gamepad
-    GamepadManager::InitializeQuery(getEventState());
-
-    // init ECS
-    ECS::Init();
-
-    // register components
-    ECS::RegisterComponent<Transform2D>();
-    ECS::RegisterComponent<Material2D>();
-    ECS::RegisterComponent<Gamepad>();
-
-    // register systems
-    ECS::RegisterSystem<ECS_QuadRenderer>();
-
-    // get reference of the system
-    renderer = ECS::GetSystem<ECS_QuadRenderer>();
-
-    // set signatures to system
-    ECS::SetSystemSignature<ECS_QuadRenderer>(
-        ECS::GetComponentType<Transform2D>(),
-        ECS::GetComponentType<Material2D>()
-    );
-
-    // create entity
-    greenEntity = ECS::CreateEntity();
-    // add components to entity
-    ECS::AddComponent(greenEntity, 
-    Transform2D{
-        .position = {0.6f, -0.5f},
-        .rotation = 0.0f,
-        .size = {0.6f, 0.6f}
-    },
-    Material2D{
-        .texIndex = TextureManager::GetTextureIndex("default"),
-        .color = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)
-    },
-    Gamepad{
-
-    }
-    );
-
-    // put gamepad into gamepad manager
-    GamepadManager::SetGamepad(ECS::GetComponent<Gamepad>(greenEntity), 0);
 }
 
 void TestWindow::stepUpdate(double ts){
-    // make entity spin
-    auto& pos = ECS::GetComponent<Transform2D>(greenEntity);
-    pos.rotation += 2.0f;
-
-    // make entity move according to the controller input
-    auto& gamepad = ECS::GetComponent<Gamepad>(greenEntity);
-
-    // check for input
-    if(getButtonInput(gamepad, PLAYSTATION_BUTTON_CROSS)){
-        // apply rumble
-        applyRumble(gamepad, 65535, 65535, 1000);
-    }
-
     //* Update appropriately the camera projection
     camera.setDimensions(getWidth(), getHeight());
 }
 
 void TestWindow::update(){
-    // poll gamepad inputs
-    GamepadManager::PollIO();
+
 }
 
 void TestWindow::render(double alpha){
@@ -119,9 +55,6 @@ void TestWindow::render(double alpha){
 
     // render background
     glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-
-    // test ECS quad renderer system
-    renderer->render(alpha); 
 
     // test quad renderer
     QuadRenderer::StackQuad(TextureManager::GetTextureIndex("default"), glm::vec2(0.0f), glm::vec2(0.5f), 0.0f, glm::vec4(0.0f, 0.5f, 0.5f, 1.0f));
