@@ -6,7 +6,7 @@ layout (location = 3) in vec4 color;
 
 out vec2 o_TexCoords;
 out float o_TexIndex;
-out vec4 o_spriteColor;
+out vec4 o_quadColor;
 
 uniform mat4 projectionView;
 
@@ -14,5 +14,5 @@ void main(){
     gl_Position = projectionView * vec4(vertex, 0.0, 1.0);
     o_TexCoords = texCoords;
     o_TexIndex = texIndex;
-    o_spriteColor = color;
+    o_quadColor = color;
 }

@@ -1,7 +1,7 @@
 #version 320 es
 precision highp float;
 in vec2 o_TexCoords;
-in vec4 o_spriteColor;
+in vec4 o_quadColor;
 in float o_TexIndex;
 
 out vec4 color;
@@ -9,7 +9,7 @@ out vec4 color;
 uniform sampler2D image[32];
 
 void main(){   
-    vec4 texColor = o_spriteColor;
+    vec4 texColor = o_quadColor;
 
     switch(int(o_TexIndex))
 	{
