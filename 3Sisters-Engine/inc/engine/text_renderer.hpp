@@ -22,7 +22,7 @@
 */
 class TextRenderer{
     public:        
-        // initialize the text renderer which requires the width and height of the display area and a loaded shader
+        // initialize the text renderer which requires a loaded shader and height of the display area which is used to calculate the pixel scale of the rendered text
         static void Init(Shader& shader, unsigned int window_height);
         
         //* draw render function
@@ -43,11 +43,11 @@ class TextRenderer{
         //* setter functions
         
         // set the window height, which is used to calculate the pixel scale of the rendered text
-        static void setWindowHeight(unsigned int height);
+        static void SetWindowHeight(unsigned int height);
         
         //* flush functions
         
-        // used to tell the GPU to render the stored characters in the buffer
+        // used to tell the GPU to render the stored characters in the stack buffer
         static void FlushText();
         
     private:
@@ -94,7 +94,7 @@ class TextRenderer{
         //* Batch functions
         
         // begin character batch
-        void static beginCharacterBatch();
+        static void beginCharacterBatch();
         
         // end character batch
         static bool endCharacterBatch();

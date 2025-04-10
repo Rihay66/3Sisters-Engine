@@ -117,7 +117,7 @@ void TextRenderer::StackCharacters(CharacterSet &set, std::string text, glm::vec
     createCharacter(set, text, position, rotation, size, color);
 }
 
-void TextRenderer::setWindowHeight(unsigned int height){
+void TextRenderer::SetWindowHeight(unsigned int height){
     window_height = height;
 }
 
