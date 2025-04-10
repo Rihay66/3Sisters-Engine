@@ -21,7 +21,7 @@
 */
 class LineRenderer{    
     public:
-        // initialize the line renderer which requires a loaded shader and pixel size of all line objects
+        // initialize the line renderer which requires a loaded shader
         static void Init(Shader& lineShader);
 
         //* draw render primatives functions

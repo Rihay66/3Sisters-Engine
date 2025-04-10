@@ -23,17 +23,17 @@
 */
 class QuadRenderer{    
     public:
-        // initialize the quad renderer which requires a loaded shader and pixel size of all quad objects
+        // initialize the quad renderer which requires a loaded shader
         static void Init(Shader& quadShader);
 
         //* draw render primatives functions
 
-        // draw a singular quad utilizing given raw data, without interpolation
+        // draw a singular quad utilizing given raw data
         static void DrawQuad(int texIndex, glm::vec2 position, glm::vec2 size, float rotation, glm::vec4 color = glm::vec4(1.0f), const std::array<glm::vec2, 4> texCoords = textureCoordinates, const glm::vec4 vertexPositions[] = quadVertexPositions);
 
         //* stack primative functions
 
-        /* store a single quad utilizing given raw data, without interpolation
+        /* store a single quad utilizing given raw data
             @Requires the Flush() after this function in order to render what was stored
             @Without the Flush() stacked objects will be rendered either way, however it's behavior is undefined
         */
