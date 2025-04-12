@@ -3,10 +3,13 @@
 #ifndef SISTERS_GLFW_KEYBOARD_HPP
 #define SISTERS_GLFW_KEYBOARD_HPP
 
+// include boolean
+#include <stdbool.h>
+
 /* Host several macros and functions to allow for keyboard inputs
 */
 namespace GLFW{
-
+    
 //? Engine renamed GLFW US key codes, refer to https://www.glfw.org/docs/3.3/group__keys.html 
 
 #define SISTER_KEY_SPACE 32
@@ -130,6 +133,9 @@ namespace GLFW{
 #define SISTER_KEY_RIGHT_SUPER 347
 #define SISTER_KEY_MENU 348
 #define SISTER_KEY_LAST SISTER_KEY_MENU
+
+// define keyboard structure
+extern bool g_KeyboardState[SISTER_KEY_LAST];
 
 /* key callback of the keyboard which checks for the given key
 * @NOTE: Checks if key was pressed

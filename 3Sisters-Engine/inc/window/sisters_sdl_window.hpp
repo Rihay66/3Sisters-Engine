@@ -8,10 +8,6 @@
     #include <windows.h>
 #endif
 
-// include SDL based input headers
-#include <input/sisters_sdl_keyboard.hpp>
-#include <input/managers/sisters_sdl_gamepad_manager.hpp>
-
 // GLAD and SDL libraries
 #include <glad/glad.h>
 #include <SDL3/SDL.h>
@@ -56,9 +52,6 @@ class Window{
 
         // private storage of SDL events
         SDL_Event eventHandle;
-
-        // private storage of keyboard state holder
-        KeyboardStateHolder* kState = nullptr;
     
     protected:
         // used to set the target frame time between frame, aka max frame time
@@ -106,11 +99,6 @@ class Window{
         * @NOTE: the event handle gets updated every frame 
         */
         SDL_Event& getEventState(){return this->eventHandle;}
-
-        /* returns a reference to the keyboard state holder that is updated by runtime()
-        *  
-        */
-        KeyboardStateHolder* getKeyboardState() {return this->kState;}
 
         /* returns reference of the window handle
         * @NOTE: initializeWindow() must be called otherwise this returns nullptr

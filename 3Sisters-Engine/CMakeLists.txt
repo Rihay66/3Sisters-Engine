@@ -39,12 +39,8 @@ set(ECS
 set(INPUT
     src/input/sisters_sdl_gamepad.cpp
     src/input/sisters_glfw_gamepad.cpp
-    src/input/managers/sisters_glfw_gamepad_manager.cpp
-    src/input/managers/sisters_sdl_gamepad_manager.cpp
     src/input/sisters_sdl_keyboard.cpp
-    src/input/sisters_glfw_keyboard.cpp
-    src/input/managers/sisters_glfw_keyboard_manager.cpp
-    src/input/managers/sisters_sdl_keyboard_manager.cpp)
+    src/input/sisters_glfw_keyboard.cpp)
 
 set(SOUND 
     src/sound/sound_buffer.cpp

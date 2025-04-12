@@ -3,7 +3,9 @@
 #ifndef SISTERS_GLFW_GAMEPAD_HPP
 #define SISTERS_GLFW_GAMEPAD_HPP
 
-// include standard memory library
+// include standard headers
+#include <vector>
+#include <array>
 #include <memory>
 
 // include GLFW
@@ -133,7 +135,37 @@ struct Gamepad{
     std::shared_ptr<ControllerDevice> device;
 };
 
-//? Gamepad functions
+//* Gamepad Connection functions
+
+// define a queued gamepad that needs to be set
+struct QueuedGamepad{
+    // wanted index to be set, default picks a NULL value
+    int index = -1;
+    // stored reference of the gamepad that needs to be set
+    GLFW::Gamepad* gamepad = nullptr;
+};
+
+// define a dynamic list of yet to be set gamepads components from objects or entities
+extern std::vector<QueuedGamepad> g_QueuedGamepads;
+
+// define a list of game controllers detected by GLFW
+extern std::array<std::shared_ptr<GLFW::ControllerDevice>, 15> g_controllerDevices;
+
+// returns the number of devices that identify as "Gamepads"
+int getGamepadAmount();
+
+/* add a gamepad reference that can be filled from the list of queried gamepads
+* @NOTE: By default picks the first gamepad
+*/
+void setGamepad(GLFW::Gamepad& gamepad, int index = 0);
+
+// create a gamepad reference to be used on connection
+void enableGamepad(int jid);
+
+// disable gamepad reference when disconnected
+void disableGamepad(int jid);
+
+//* Gamepad Input functions
 
 /* button callback of the gamepad which checks for the given button
 * @NOTE: Requires a set gamepad

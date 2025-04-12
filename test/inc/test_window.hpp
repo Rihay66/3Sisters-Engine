@@ -4,15 +4,16 @@
 #define TEST_WINDOW_HPP
 
 #include <cameras/ortho_camera.hpp>
-#include <window/sisters_sdl_window.hpp>
-#include <input/sisters_sdl_gamepad.hpp>
-#include <input/managers/sisters_sdl_gamepad_manager.hpp>
+#include <window/sisters_glfw_window.hpp>
+#include "input/sisters_glfw_gamepad.hpp"
 
-using namespace SDL;
+using namespace GLFW;
 
 class TestWindow : public Window {
     private:
         OrthoCamera camera;
+        // private storage of a gamepad
+        Gamepad pad;
     public:
         TestWindow();
         ~TestWindow();

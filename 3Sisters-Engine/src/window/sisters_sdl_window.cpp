@@ -1,5 +1,9 @@
 #include <window/sisters_sdl_window.hpp>
 
+// include input headers
+#include <input/sisters_sdl_keyboard.hpp>
+#include <input/sisters_sdl_gamepad.hpp>
+
 // include standard libraries
 #include <iostream>
 #include <cstddef>
@@ -12,9 +16,14 @@ Window::Window(){
 }
 
 Window::~Window(){
-    // delete the keyboard state holder
-    delete this->kState;
-
+    // close all created SDL joysticks
+    for(int i = 0; i < g_QueuedGamepads.size(); i++){
+        if(g_QueuedGamepads.at(i).gamepad->device != nullptr){
+            // then close the joystick
+            SDL_CloseGamepad(g_QueuedGamepads.at(i).gamepad->device);
+        }
+    }
+    
     SDL_GL_DestroyContext(context);
     SDL_DestroyWindow(handle);
     SDL_Quit();
@@ -117,8 +126,7 @@ void Window::initializeWindow(int w, int h, const char* name){
     setUpOpenGL();
 
     // set up keyboard state holder
-    this->kState = new KeyboardStateHolder();
-    this->kState->keyboardState = (Uint8*)SDL_GetKeyboardState(NULL);
+    g_KeyboardState.keyboardState = (Uint8*)SDL_GetKeyboardState(NULL);
 
     // TODO: Create debug options for the window class to display to a console
     // show any errors or messages
@@ -149,7 +157,7 @@ void Window::render(double alpha){
 // single threaded runtime of input(), update(), stepUpdate() and render()
 void Window::runtime(){
     // check if GLFW has been initialized
-    if(handle == nullptr || kState == nullptr){
+    if(handle == nullptr){
         //! display error
         std::cout << "ERROR: Window or keyboard state holder hasn't been initialized\n";
         return; // stop function
@@ -181,16 +189,23 @@ void Window::runtime(){
                 glViewport(0, 0, width, height);
 
                 break;
+            case SDL_EVENT_GAMEPAD_ADDED:
+                // call for enable gamepad with the correspoding device
+                SDL::enableGamepad(eventHandle.gdevice.which);
+    
+                break;
+            case SDL_EVENT_GAMEPAD_REMOVED:
+                // disable the gamepad that was removed
+                SDL::disableGamepad(eventHandle.gdevice.which);
+    
+                break;
             default:
                 break;
           }
-
-          // check for device IO events, works only when GamepadManager is initialized
-          GamepadManager::PollIO();
         }
 
         // grab the current keyboard state
-        this->kState->keyboardState = (uint8_t*)SDL_GetKeyboardState(NULL);
+        g_KeyboardState.keyboardState = (uint8_t*)SDL_GetKeyboardState(NULL);
 
         //  accumulate time and do stepUpdate()
         this->accumulator += this->DeltaTime;

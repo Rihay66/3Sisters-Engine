@@ -1,8 +1,12 @@
 #include "../inc/test_window.hpp"
 #include "engine/text_renderer.hpp"
+#include "input/sisters_glfw_keyboard.hpp"
+#include "input/sisters_glfw_gamepad.hpp"
 #include <resourceSystems/managers/texture_manager.hpp>
 #include <resourceSystems/managers/shader_manager.hpp>
 #include <engine/quad_renderer.hpp>
+
+#include <iostream>
 
 TestWindow::TestWindow() : Window(){
 
@@ -36,11 +40,23 @@ void TestWindow::init(){
     // set up renderers
     QuadRenderer::Init(ShaderManager::GetShader("quad"));
     TextRenderer::Init(ShaderManager::GetShader("text"), getHeight());
+    
+    // set gamepad
+    setGamepad(pad);
 }
 
 void TestWindow::stepUpdate(double ts){
     //* Update appropriately the camera projection
     camera.setDimensions(getWidth(), getHeight());
+    
+    //* test input
+    if(GLFW::getKeyInput(SISTER_KEY_E)){
+        std::cout << "E was pressed!\n";
+    }
+    
+    if(GLFW::getButtonInput(pad, SISTER_BUTTON_SOUTH)){
+        std::cout << "South button pressed!\n";
+    }
 }
 
 void TestWindow::update(){

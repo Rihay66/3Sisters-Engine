@@ -3,6 +3,10 @@
 #ifndef SISTERS_SDL_GAMEPAD_HPP
 #define SISTERS_SDL_GAMEPAD_HPP
 
+// include standard headers
+#include <vector>
+#include <cstdint>
+
 // include SDL
 #include <SDL3/SDL.h>
 
@@ -116,7 +120,35 @@ struct Gamepad{
     SDL_Gamepad* device = nullptr;
 };
 
-//? Gamepad functions
+//* Gamepad Connection functions
+
+// define a queued gamepad that needs to be set
+struct QueuedGamepad{
+    // wanted priority to be set, default picks a NULL value
+    int priority = 0;
+    // stored reference of the gamepad that needs to be set
+    SDL::Gamepad* gamepad = nullptr;
+};
+
+// define a dynamic list of yet to be set gamepads components from objects or entities
+extern std::vector<QueuedGamepad> g_QueuedGamepads;
+
+// returns the number of devices that identify as "Gamepads"
+int getGamepadAmount();
+
+/* add a gamepad reference that can be filled from the list of queried gamepads
+* @NOTE: By default picks and sets the first gamepad with the highest priority number
+* @NOTE: Multiple gamepads aiming to be the same priority, only one will be set
+*/
+void setGamepad(SDL::Gamepad& gamepad, int priority = 0);
+
+// create a gamepad reference to be used on connection
+void enableGamepad(int index);
+
+// disable gamepad reference when disconnected
+void disableGamepad(int index);
+
+//? Gamepad Input functions
 
 /* button callback of the gamepad which checks for the given button
 * @NOTE: Requires a set gamepad

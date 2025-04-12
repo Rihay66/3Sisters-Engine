@@ -5,11 +5,6 @@
 
 #include <stdint.h>
 
-// define a keyboard state holder
-struct KeyboardStateHolder {
-  uint8_t *keyboardState;
-};
-
 /* Host several macros and functions to allow for keyboard inputs
 */
 namespace SDL {
@@ -207,20 +202,28 @@ namespace SDL {
 #define SISTER_KEY_KP_COMMA 133
 #define SISTER_KEY_KP_EQUALSAS400 134
 
+// define a keyboard state holder
+struct KeyboardStateHolder {
+  uint8_t *keyboardState;
+};
+
+// define global of the state
+extern struct KeyboardStateHolder g_KeyboardState;
+
 /* key callback of the keyboard which checks for the given KEY
  * @NOTE: Checks if key was pressed
  */
-bool getKeyInput(int KEY);
+bool getKeyInput(int key);
 
 /* key callback of the keyboard which checks for the given KEY
  * @NOTE: Checks if key was pressed similar to getKeyInput
  */
-bool getKeyInputDown(int KEY);
+bool getKeyInputDown(int key);
 
 /* key callback of the keyboard which checks for the given KEY
  * @NOTE: Check if key was released
  */
-bool getKeyInputUp(int KEY);
+bool getKeyInputUp(int key);
 
 } 
 #endif

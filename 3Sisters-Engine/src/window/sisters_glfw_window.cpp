@@ -3,6 +3,10 @@
 // include the namespace
 using namespace GLFW;
 
+// include input headers
+#include <input/sisters_glfw_keyboard.hpp>
+#include <input/sisters_glfw_gamepad.hpp>
+
 // include standard libraries
 #include <iostream>
 #include <chrono>
@@ -10,6 +14,34 @@ using namespace GLFW;
 // callback function to move the OpenGL viewport to the GLFW window's position
 static void framebuffer_size_callback(GLFWwindow* window, int width, int height){
     glViewport(0, 0, width, height);
+}
+
+// callback function to check for keyboard inputs and apply them to the global keyboard state
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods){
+    if(key < 0)
+        return;
+    
+    switch(action){
+        case GLFW_PRESS:
+            g_KeyboardState[key] = true;
+            break;
+        case GLFW_RELEASE:
+            g_KeyboardState[key] = false;
+            break;
+        default:
+            break;
+    }
+}
+
+static void controller_connection_callback(int jid, int event){
+    // check event type
+    if(event == GLFW_CONNECTED){
+        // create or enable a gamepad
+        enableGamepad(jid);
+    }else if(event == GLFW_DISCONNECTED){
+        // disable a gamepad
+        disableGamepad(jid);
+    }  
 }
 
 // constructor
@@ -62,7 +94,7 @@ void Window::initializeWindow(int w, int h, const char* name){
     }
 
     // create window
-    glfwMakeContextCurrent((GLFWwindow *)handle);
+    glfwMakeContextCurrent((GLFWwindow*)handle);
 
     // load glad
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -70,8 +102,29 @@ void Window::initializeWindow(int w, int h, const char* name){
         exit(-1);
     }
 
+    //* set up callbacks
+    
     // set up call back to update the opengl window
-    glfwSetFramebufferSizeCallback((GLFWwindow *)handle, framebuffer_size_callback);
+    glfwSetFramebufferSizeCallback((GLFWwindow*)handle, framebuffer_size_callback);
+    // set up call back to update the keyboard state
+    glfwSetKeyCallback((GLFWwindow*)handle, key_callback);
+    
+    // check all slots for pre-connected devices
+    for(int i = 0; i < GLFW_JOYSTICK_LAST; i++){
+        // check if it is a gamepad and it's slot doesn't exist
+        if(glfwJoystickIsGamepad(i) == GLFW_TRUE && g_controllerDevices.at(i) == nullptr){
+            // create controller device
+            g_controllerDevices.at(i) = std::make_shared<ControllerDevice>();
+            // set the ID
+            g_controllerDevices.at(i)->ID = i;
+            // then set the connection to be true
+            g_controllerDevices.at(i)->isConnected = true;
+        }
+    }
+    
+    // throw ID into a connection or disconnect events
+    glfwSetJoystickCallback(controller_connection_callback);
+    
     // set openGL window size
     glViewport(0, 0, width, height);
 
@@ -172,6 +225,14 @@ void Window::runtime(){
 
         // check for glfw events
         glfwPollEvents();
+        
+        // loop through available gamepads and updated their states
+        for(int i = 0; i < g_controllerDevices.size(); i++){
+            if(g_controllerDevices.at(i) != nullptr && g_controllerDevices.at(i)->isConnected){
+                // update state
+                glfwGetGamepadState(i, &g_controllerDevices.at(i)->state);
+            }
+        }
 
         // gran current window size
         glfwGetWindowSize((GLFWwindow*)handle, &width, &height);
