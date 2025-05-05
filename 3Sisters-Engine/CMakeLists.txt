@@ -43,10 +43,8 @@ set(INPUT
     src/input/sisters_glfw_keyboard.cpp)
 
 set(SOUND 
-    src/sound/sound_buffer.cpp
-    src/sound/sound_device.cpp
-    src/sound/sound_source.cpp
-    src/sound/managers/sound_manager.cpp)
+    src/soundSystems/types/sound_source.cpp
+    src/soundSystems/managers/sound_manager.cpp)
 
 set(ENGINE 
     src/engine/line_renderer.cpp
@@ -71,7 +69,7 @@ target_include_directories(3Sisters-Engine PRIVATE
 )
 
 # include all dependencies
-target_link_libraries(3Sisters-Engine glm glfw SDL3::SDL3-static OpenAL::OpenAL)
+target_link_libraries(3Sisters-Engine glm glfw SDL3::SDL3-static OpenAL::OpenAL sndfile)
 
 # Include directory for engine's headers
 set(ENGINE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/inc)

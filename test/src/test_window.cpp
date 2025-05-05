@@ -1,10 +1,11 @@
 #include "../inc/test_window.hpp"
 #include "engine/text_renderer.hpp"
-#include "input/sisters_glfw_keyboard.hpp"
-#include "input/sisters_glfw_gamepad.hpp"
+#include "input/sisters_sdl_keyboard.hpp"
+#include "input/sisters_sdl_gamepad.hpp"
 #include <resourceSystems/managers/texture_manager.hpp>
 #include <resourceSystems/managers/shader_manager.hpp>
 #include <engine/quad_renderer.hpp>
+#include <soundSystems/managers/sound_manager.hpp>
 
 #include <iostream>
 
@@ -17,6 +18,20 @@ TestWindow::~TestWindow() {
 }
 
 void TestWindow::init(){  
+    
+    //Grab sound devices
+    SoundManager::InitDevice();
+
+    // load a sound
+    SoundManager::LoadSound("test", "sounds/test.wav");
+
+    // create a sound source
+    auto& source = SoundManager::CreateSoundSource("test");
+
+    source.setBuffer(SoundManager::GetSound("test"));
+
+    source.play();
+
     // load a quad shader
     ShaderManager::LoadShader("shaders/quad.vert", "shaders/quad.frag", nullptr, "quad");
     // load a line shader
@@ -48,13 +63,13 @@ void TestWindow::init(){
 void TestWindow::stepUpdate(double ts){
     //* Update appropriately the camera projection
     camera.setDimensions(getWidth(), getHeight());
-    
+
     //* test input
-    if(GLFW::getKeyInput(SISTER_KEY_E)){
+    if(SDL::getKeyInput(SISTER_KEY_E)){
         std::cout << "E was pressed!\n";
     }
     
-    if(GLFW::getButtonInput(pad, SISTER_BUTTON_SOUTH)){
+    if(SDL::getButtonInput(pad, SISTER_BUTTON_SOUTH)){
         std::cout << "South button pressed!\n";
     }
 }
