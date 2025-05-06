@@ -175,6 +175,8 @@ SoundBuffer SoundManager::LoadSound(std::string name, const char* filename){
 SoundSource& SoundManager::CreateSoundSource(std::string name, SoundBuffer buffer){
     // create local sound source
     SoundSource source;
+    // generate source
+    source.generateSource();
     // set buffer that is passed down
     source.setBuffer(buffer);
     // store source and return it
@@ -183,7 +185,7 @@ SoundSource& SoundManager::CreateSoundSource(std::string name, SoundBuffer buffe
 }
 
 void SoundManager::Clear(){
-    // try and catch any errors
+    // try to properly close OpenAL and catch any errors
     try{
         // clear all sound sources
         for(auto& it : sources){

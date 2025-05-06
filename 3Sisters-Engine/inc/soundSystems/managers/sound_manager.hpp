@@ -11,8 +11,8 @@
 
 // include necessary components
 #include <soundSystems/types/sound_device.hpp>
-#include <soundSystems/types/sound_source.hpp>
 #include <soundSystems/types/sound_buffer.hpp>
+#include <soundSystems/sound_source.hpp>
 
 /* A Static singleton Sound Manager class that hosts several
  function to load, retrieve, and store sounds. It also handles
@@ -47,7 +47,8 @@ class SoundManager{
         static SoundBuffer LoadSound(std::string name, const char* filename);
 
         /* create a sound source by name.
-        * Optionally give a loaded sound buffer to the sound source upon creation
+        * Optionally give a loaded sound buffer to the sound source upon creation.
+        * NOTE: Sound Manager automatically handles properly deleting sources
         */
         static SoundSource& CreateSoundSource(std::string name, SoundBuffer buffer = INT_MAX);
 

@@ -1,7 +1,20 @@
-#include <soundSystems/types/sound_source.hpp>
+#include <soundSystems/sound_source.hpp>
 
 // include the sound manager for auto clear
 #include <soundSystems/managers/sound_manager.hpp>
+
+unsigned int& SoundSource::generateSource(){
+    // generate OpenAL source
+    alGenSources(1, &source);
+    alSourcef(source, AL_PITCH, pitch);
+    alSourcef(source, AL_GAIN, gain);
+    alSource3f(source, AL_POSITION, position.x, position.y, position.z);
+    alSource3f(source, AL_VELOCITY, velocity.x, velocity.y, velocity.z);
+    alSourcei(source, AL_LOOPING, loopSound);
+    alSourcei(source, AL_BUFFER, buffer);
+
+    return source;
+}
 
 void SoundSource::setPitch(float p){
     // check if parameter is within a range
@@ -118,19 +131,4 @@ void SoundSource::restartSound(){
     alSourcePause(source);
     // restart the sound
     alSourceRewind(source);;
-}
-
-
-SoundSource::SoundSource(){
-    // initialize OpenAL, if it hasn't been initialized
-    SoundManager::InitDevice();
-
-    // generate OpenAL source
-    alGenSources(1, &source);
-    alSourcef(source, AL_PITCH, pitch);
-    alSourcef(source, AL_GAIN, gain);
-    alSource3f(source, AL_POSITION, position.x, position.y, position.z);
-    alSource3f(source, AL_VELOCITY, velocity.x, velocity.y, velocity.z);
-    alSourcei(source, AL_LOOPING, loopSound);
-    alSourcei(source, AL_BUFFER, buffer);
 }

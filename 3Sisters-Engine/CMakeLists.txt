@@ -43,7 +43,7 @@ set(INPUT
     src/input/sisters_glfw_keyboard.cpp)
 
 set(SOUND 
-    src/soundSystems/types/sound_source.cpp
+    src/soundSystems/sound_source.cpp
     src/soundSystems/managers/sound_manager.cpp)
 
 set(ENGINE 

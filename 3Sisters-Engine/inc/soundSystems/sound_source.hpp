@@ -31,6 +31,12 @@ class SoundSource{
         unsigned int buffer = 0;
 
     public:
+        /* generate sound source using OpenAL.
+        * Requires a OpenAL device and context to be initialized
+        * Warning: If not using SoundManager, you're responsinble for properly deleting the generate source
+        */ 
+        unsigned int& generateSource();
+
         //* setter functions
 
         // sets the pitch of the source, takes in a value within 0.0f to 1.0f
@@ -75,9 +81,6 @@ class SoundSource{
 
         // pauses current sound and restarts the sound to the beginning
         void restartSound();
-
-        // constructor
-        SoundSource();
 };
 
 #endif
