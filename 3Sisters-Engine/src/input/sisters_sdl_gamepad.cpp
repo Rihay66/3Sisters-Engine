@@ -40,8 +40,6 @@ void SDL::setGamepad(Gamepad& gamepad, int priority){
 void SDL::enableGamepad(int jid){
     // create a new gamepad using the given JID
     SDL_Gamepad* gamepad = SDL_OpenGamepad(jid);
-    
-    //std::cout << "Enabling controller at: " << jid << "\n";
 
     // set pad into the queried and then set pads according to priority
     
@@ -64,7 +62,6 @@ void SDL::enableGamepad(int jid){
 }
 
 void SDL::disableGamepad(int jid){
-    //std::cout << "Closing controller at: " << jid << "\n";
     // check for given JID which device was removed and properly close it
     for(QueuedGamepad& pads : g_QueuedGamepads){
         // check if pad is set
