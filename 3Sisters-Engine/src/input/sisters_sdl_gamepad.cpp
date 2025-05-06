@@ -82,7 +82,7 @@ bool SDL::getButtonInput(Gamepad &pad, int key){
     // check if gamepad is set and connected
     if(pad.device != nullptr && pad.isConnected){
         // check state of given key
-        if(SDL_GetGamepadButton(pad.device, (SDL_GamepadButton)key) > 0){
+        if(SDL_GetGamepadButton(pad.device, (SDL_GamepadButton)key)){
             return true;
         }
     }
