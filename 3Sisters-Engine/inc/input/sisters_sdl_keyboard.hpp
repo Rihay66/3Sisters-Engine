@@ -9,7 +9,7 @@
 */
 namespace SDL {
 
-//? Engine renamed keyboard scancodes from SDL, refer to https://wiki.libsdl.org/SDL2/SDL_Scancode
+//? Engine renamed keyboard scancodes from SDL refer to https://wiki.libsdl.org/SDL2/SDL_Scancode
 
 #define SISTER_KEY_UNKNOWN 0
 #define SISTER_KEY_A 4
@@ -201,6 +201,91 @@ namespace SDL {
 #define SISTER_KEY_VOLUMEDOWN 129
 #define SISTER_KEY_KP_COMMA 133
 #define SISTER_KEY_KP_EQUALSAS400 134
+#define SISTER_KEY_INTERNATIONAL1  135 /**< used on Asian keyboards see
+                                        footnotes in USB doc */
+#define SISTER_KEY_INTERNATIONAL2  136
+#define SISTER_KEY_INTERNATIONAL3  137 /**< Yen */
+#define SISTER_KEY_INTERNATIONAL4  138
+#define SISTER_KEY_INTERNATIONAL5  139
+#define SISTER_KEY_INTERNATIONAL6  140
+#define SISTER_KEY_INTERNATIONAL7  141
+#define SISTER_KEY_INTERNATIONAL8  142
+#define SISTER_KEY_INTERNATIONAL9  143
+#define SISTER_KEY_LANG1  144 /**< Hangul/English toggle */
+#define SISTER_KEY_LANG2  145 /**< Hanja conversion */
+#define SISTER_KEY_LANG3  146 /**< Katakana */
+#define SISTER_KEY_LANG4  147 /**< Hiragana */
+#define SISTER_KEY_LANG5  148 /**< Zenkaku/Hankaku */
+#define SISTER_KEY_LANG6  149 /**< reserved */
+#define SISTER_KEY_LANG7  150 /**< reserved */
+#define SISTER_KEY_LANG8  151 /**< reserved */
+#define SISTER_KEY_LANG9  152 /**< reserved */
+#define SISTER_KEY_ALTERASE  153    /**< Erase-Eaze */
+#define SISTER_KEY_SYSREQ  154
+#define SISTER_KEY_CANCEL  155      /**< AC Cancel */
+#define SISTER_KEY_CLEAR  156
+#define SISTER_KEY_PRIOR  157
+#define SISTER_KEY_RETURN2  158
+#define SISTER_KEY_SEPARATOR  159
+#define SISTER_KEY_OUT  160
+#define SISTER_KEY_OPER  161
+#define SISTER_KEY_CLEARAGAIN  162
+#define SISTER_KEY_CRSEL  163
+#define SISTER_KEY_EXSEL  164
+#define SISTER_KEY_KP_00  176
+#define SISTER_KEY_KP_000  177
+#define SISTER_KEY_THOUSANDSSEPARATOR  178
+#define SISTER_KEY_DECIMALSEPARATOR  179
+#define SISTER_KEY_CURRENCYUNIT  180
+#define SISTER_KEY_CURRENCYSUBUNIT  181
+#define SISTER_KEY_KP_LEFTPAREN  182
+#define SISTER_KEY_KP_RIGHTPAREN  183
+#define SISTER_KEY_KP_LEFTBRACE  184
+#define SISTER_KEY_KP_RIGHTBRACE  185
+#define SISTER_KEY_KP_TAB  186
+#define SISTER_KEY_KP_BACKSPACE  187
+#define SISTER_KEY_KP_A  188
+#define SISTER_KEY_KP_B  189
+#define SISTER_KEY_KP_C  190
+#define SISTER_KEY_KP_D  191
+#define SISTER_KEY_KP_E  192
+#define SISTER_KEY_KP_F  193
+#define SISTER_KEY_KP_XOR  194
+#define SISTER_KEY_KP_POWER  195
+#define SISTER_KEY_KP_PERCENT  196
+#define SISTER_KEY_KP_LESS  197
+#define SISTER_KEY_KP_GREATER  198
+#define SISTER_KEY_KP_AMPERSAND  199
+#define SISTER_KEY_KP_DBLAMPERSAND  200
+#define SISTER_KEY_KP_VERTICALBAR  201
+#define SISTER_KEY_KP_DBLVERTICALBAR  202
+#define SISTER_KEY_KP_COLON  203
+#define SISTER_KEY_KP_HASH  204
+#define SISTER_KEY_KP_SPACE  205
+#define SISTER_KEY_KP_AT  206
+#define SISTER_KEY_KP_EXCLAM  207
+#define SISTER_KEY_KP_MEMSTORE  208
+#define SISTER_KEY_KP_MEMRECALL  209
+#define SISTER_KEY_KP_MEMCLEAR  210
+#define SISTER_KEY_KP_MEMADD  211
+#define SISTER_KEY_KP_MEMSUBTRACT  212
+#define SISTER_KEY_KP_MEMMULTIPLY  213
+#define SISTER_KEY_KP_MEMDIVIDE  214
+#define SISTER_KEY_KP_PLUSMINUS  215
+#define SISTER_KEY_KP_CLEAR  216
+#define SISTER_KEY_KP_CLEARENTRY  217
+#define SISTER_KEY_KP_BINARY  218
+#define SISTER_KEY_KP_OCTAL  219
+#define SISTER_KEY_KP_DECIMAL  220
+#define SISTER_KEY_KP_HEXADECIMAL  221
+#define SISTER_KEY_LCTRL  224
+#define SISTER_KEY_LSHIFT  225
+#define SISTER_KEY_LALT  226 /**< alt option */
+#define SISTER_KEY_LGUI  227 /**< windows command (apple) meta */
+#define SISTER_KEY_RCTRL  228
+#define SISTER_KEY_RSHIFT  229
+#define SISTER_KEY_RALT  230 /**< alt gr option */
+#define SISTER_KEY_RGUI  231 /**< windows command (apple) meta */
 
 // define a keyboard state holder
 struct KeyboardStateHolder {
