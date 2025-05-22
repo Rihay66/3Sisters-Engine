@@ -38,9 +38,10 @@ Texture& TextureManager::LoadTexture(const char *file, std::string name, bool is
                 break;
             }
             // get the file extension name
-            for(int i = 0 ; i < fileExtension; i++){
+            for(int i = 0 ; i < fileExtension + 1; i++){
                 fileImageformat[i] = file[(fileNameLength - fileExtension) + i];
             }
+
             break;
         }
     }
