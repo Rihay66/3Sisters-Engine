@@ -168,6 +168,9 @@ void Window::runtime(){
 
     // call init for resource initialization
     init();
+    
+    // grab the current keyboard state
+    g_KeyboardState.keyboardState = (uint8_t*)SDL_GetKeyboardState(NULL);
 
     while(!quit){
         // start timing the frame
@@ -203,10 +206,9 @@ void Window::runtime(){
                 break;
           }
         }
-
-        // grab the current keyboard state
-        g_KeyboardState.keyboardState = (uint8_t*)SDL_GetKeyboardState(NULL);
-
+        
+        // pump
+        
         //  accumulate time and do stepUpdate()
         this->accumulator += this->DeltaTime;
         while(this->accumulator >= fixedTimeStep){
