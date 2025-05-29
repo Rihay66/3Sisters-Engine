@@ -15,7 +15,7 @@ EntityManager::EntityManager(){
 Entity EntityManager::CreateEntity(){
     if(livingEntityCount > MAX_ENTITIES){
         //? display error
-        std::cout << "ERROR: Too many entities in existnace!\n"; 
+        std::cout << "ERROR: Too many entities in existance!\n"; 
         return 0;
     }
 

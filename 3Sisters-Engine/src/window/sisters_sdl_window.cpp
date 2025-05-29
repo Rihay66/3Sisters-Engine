@@ -1,4 +1,5 @@
 #include "SDL3/SDL_events.h"
+#include <cmath>
 #include <window/sisters_sdl_window.hpp>
 
 // include input headers
@@ -45,6 +46,14 @@ void Window::setFixedTimeStep(double time){
         // set the fixed time step to given parameter
         this->fixedTimeStep = time;
     }
+}
+
+void Window::setMouseWheelStopSpeed(float speed){
+    this->mouseWheelStopSpeed = fabsf(speed);
+}
+
+void Window::setMouseWheelStopDeadzone(float deadzone){
+    this->mouseWheelStopDeadzone = fabsf(deadzone);
 }
 
 void Window::additionalWindowOptions(){
@@ -231,6 +240,11 @@ void Window::runtime(){
                 SDL::g_MouseState.button ^= SISTER_MOUSE_BUTTON_MASK(eventHandle.button.button);
 
                 break;
+            case SDL_EVENT_MOUSE_WHEEL:
+                // get mouse wheel amount
+                SDL::g_MouseState.wheelY += eventHandle.wheel.y;
+                
+                break;
             case SDL_EVENT_WINDOW_MOUSE_ENTER:
                 // set mouse within window to true
                 SDL::g_MouseState.isWithinWindow = true;
@@ -241,7 +255,7 @@ void Window::runtime(){
                 SDL::g_MouseState.isWithinWindow = false;
 
                 break;  
-            default:
+            default:    
                 break;
           }
         }
@@ -251,6 +265,16 @@ void Window::runtime(){
         while(this->accumulator >= fixedTimeStep){
             // update with fixed time step
             stepUpdate(this->fixedTimeStep);
+            
+            // reduce mouse wheel amount
+            if(g_MouseState.wheelY > mouseWheelStopDeadzone){
+                g_MouseState.wheelY -= mouseWheelStopSpeed;
+            }else if(g_MouseState.wheelY < -mouseWheelStopDeadzone){
+                g_MouseState.wheelY += mouseWheelStopSpeed;
+            }else{
+                g_MouseState.wheelY = 0.0f;
+            }
+            
             accumulator -= fixedTimeStep;
         } 
         // calculate alpha for linear interpolation

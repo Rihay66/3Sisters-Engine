@@ -17,6 +17,7 @@ namespace SDL{
 // define mouse state holder
 struct MouseStateHolder{
     float x, y;
+    float wheelY = 0.0f;
     unsigned int button;
     bool isWithinWindow = true;
     bool isDoubleClicked = false;
@@ -33,6 +34,12 @@ bool getMouseInput(unsigned int button);
 
 // check for mouse button input that is clicked more than once
 bool getMouseDoubleInput(unsigned int button);
+
+// check for vertical mouse wheel
+float getMouseWheelY();
+
+// check for vertical mouse wheel raw input
+bool getMouseWheelYRaw();
 
 // check if mouse is within the window
 bool getMouseFocus();

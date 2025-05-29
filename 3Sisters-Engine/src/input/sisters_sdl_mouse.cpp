@@ -41,6 +41,18 @@ bool SDL::getMouseDoubleInput(unsigned int button){
     return false;
 }
 
+float SDL::getMouseWheelY(){
+    return g_MouseState.wheelY;
+}
+
+bool SDL::getMouseWheelYRaw(){
+    if(g_MouseState.wheelY > 0.0f || g_MouseState.wheelY < 0.0f){
+        return true;
+    }
+    
+    return false;
+}
+
 bool SDL::getMouseFocus(){
     return g_MouseState.isWithinWindow;
 }
