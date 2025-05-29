@@ -1,8 +1,10 @@
+#include "SDL3/SDL_events.h"
 #include <window/sisters_sdl_window.hpp>
 
 // include input headers
 #include <input/sisters_sdl_keyboard.hpp>
 #include <input/sisters_sdl_gamepad.hpp>
+#include <input/sisters_sdl_mouse.hpp>
 
 // include standard libraries
 #include <iostream>
@@ -77,7 +79,10 @@ void Window::initializeWindow(int w, int h, const char* name){
     height = h;
     
     // Load default OpenGL
-    SDL_GL_LoadLibrary(NULL);
+    if(!SDL_GL_LoadLibrary(NULL)){
+        std::cout << "Failed to load default OpenGL!" << std::endl;
+        exit(-1);
+    }
 
     // check if using emscripten
     #ifdef __EMSCRIPTEN__
@@ -95,7 +100,7 @@ void Window::initializeWindow(int w, int h, const char* name){
 
     // create window handle
     handle = SDL_CreateWindow(name, w, h, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
-    if(handle == nullptr){
+    if(handle == nullptr || handle == NULL){
         std::cout << "Failed to create window!" << std::endl;
         exit(-1);
     }
@@ -119,14 +124,19 @@ void Window::initializeWindow(int w, int h, const char* name){
     }
     
     // set openGL window size
-    SDL_GetWindowSize(handle, &w, &h);
+    if(!SDL_GetWindowSize(handle, &w, &h)){
+        std::cout << "Failed to get SDL window size!" << std::endl;
+        exit(-1);
+    }
     glViewport(0, 0, w, h);
 
     // add additional OpenGL capabilities
     setUpOpenGL();
 
     // set up keyboard state holder
-    g_KeyboardState.keyboardState = (Uint8*)SDL_GetKeyboardState(NULL);
+    SDL::g_KeyboardState.keyboardState = (Uint8*)SDL_GetKeyboardState(NULL);
+
+    // show any errors or messages from SDL
 
     // TODO: Create debug options for the window class to display to a console
     // show any errors or messages
@@ -168,9 +178,6 @@ void Window::runtime(){
 
     // call init for resource initialization
     init();
-    
-    // grab the current keyboard state
-    g_KeyboardState.keyboardState = (uint8_t*)SDL_GetKeyboardState(NULL);
 
     while(!quit){
         // start timing the frame
@@ -202,12 +209,42 @@ void Window::runtime(){
                 SDL::disableGamepad(eventHandle.gdevice.which);
     
                 break;
+            case SDL_EVENT_MOUSE_MOTION:
+                // update mouse position
+                SDL::g_MouseState.x = eventHandle.motion.x;
+                SDL::g_MouseState.y = eventHandle.motion.y;
+
+                break;
+            case SDL_EVENT_MOUSE_BUTTON_DOWN:
+                // enable button bit mask
+                SDL::g_MouseState.button ^= SISTER_MOUSE_BUTTON_MASK(eventHandle.button.button);
+                // check if button was double clicked
+                if(eventHandle.button.clicks >= 2){
+                    g_MouseState.isDoubleClicked = true;
+                }else{
+                    g_MouseState.isDoubleClicked = false;
+                }
+
+                break;
+            case SDL_EVENT_MOUSE_BUTTON_UP:
+                // disable button bit mask
+                SDL::g_MouseState.button ^= SISTER_MOUSE_BUTTON_MASK(eventHandle.button.button);
+
+                break;
+            case SDL_EVENT_WINDOW_MOUSE_ENTER:
+                // set mouse within window to true
+                SDL::g_MouseState.isWithinWindow = true;
+
+                break;
+            case SDL_EVENT_WINDOW_MOUSE_LEAVE:
+                // set mouse within window to false
+                SDL::g_MouseState.isWithinWindow = false;
+
+                break;  
             default:
                 break;
           }
         }
-        
-        // pump
         
         //  accumulate time and do stepUpdate()
         this->accumulator += this->DeltaTime;

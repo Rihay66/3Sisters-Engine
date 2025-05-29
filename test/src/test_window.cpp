@@ -2,20 +2,13 @@
 #include "engine/text_renderer.hpp"
 #include "input/sisters_sdl_keyboard.hpp"
 #include "input/sisters_sdl_gamepad.hpp"
+#include "input/sisters_sdl_mouse.hpp"
 #include <resourceSystems/managers/texture_manager.hpp>
 #include <resourceSystems/managers/shader_manager.hpp>
 #include <engine/quad_renderer.hpp>
 #include <soundSystems/managers/sound_manager.hpp>
 
 #include <iostream>
-
-TestWindow::TestWindow() : Window(){
-
-}
-
-TestWindow::~TestWindow() {
-    
-}
 
 void TestWindow::init(){  
     
@@ -71,6 +64,14 @@ void TestWindow::stepUpdate(double ts){
     
     if(SDL::getButtonInput(pad, SISTER_BUTTON_SOUTH)){
         std::cout << "South button pressed!\n";
+    }
+
+    if(SDL::getMouseInput(SISTER_MOUSE_BUTTON_LEFT)){
+        std::cout << "Left Mouse button pressed!\n";
+    }
+
+    if(SDL::getMouseDoubleInput(SISTER_MOUSE_BUTTON_RIGHT)){
+        std::cout << "Right Mouse button double clicked!\n";
     }
 }
 

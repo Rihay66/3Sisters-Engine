@@ -40,7 +40,8 @@ set(INPUT
     src/input/sisters_sdl_gamepad.cpp
     src/input/sisters_glfw_gamepad.cpp
     src/input/sisters_sdl_keyboard.cpp
-    src/input/sisters_glfw_keyboard.cpp)
+    src/input/sisters_glfw_keyboard.cpp
+    src/input/sisters_sdl_mouse.cpp)
 
 set(SOUND 
     src/soundSystems/sound_source.cpp
