@@ -39,7 +39,13 @@ class LineRenderer{
             @Without the Flush() stacked objects will be rendered either way, however it's behavior is undefined
         */
         static void StackLine(glm::vec2 p0, glm::vec2 p1, glm::vec4 color = glm::vec4(1.0f));
-
+        
+        /* store a single wireframe of a quad utilizing utilizing raw data and lines
+            @Requires the Flush() after this function in order to render what was stored
+            @Without the Flush() stacked objects will be rendered either way, however it's behavior is undefined
+        */
+        static void StackQuadWire(glm::vec2 position, glm::vec2 size, float rotation, glm::vec4 color = glm::vec4(1.0f));
+        
         //* flush functions
 
         // used to tell the GPU to render the stored lines in the buffer

@@ -122,6 +122,45 @@ void LineRenderer::StackLine(glm::vec2 p0, glm::vec2 p1, glm::vec4 color){
     createLine(p0, p1, color);
 }
 
+void LineRenderer::StackQuadWire(glm::vec2 position, glm::vec2 size, float rotation, glm::vec4 color){
+    //? check if buffer hasn't been set up
+    if(lineBuffer == nullptr){
+        //! Display error
+        std::cout << "ERROR: Missing line render buffer initialization!\n";
+        return; // stop function
+    }
+
+    // check if the buffer pointer hasn't been set up
+    if(lineBufferPtr == nullptr){
+        // reset render stats
+    
+        // the initialize the batch
+        beginLineBatch();
+    }
+
+    // if not create the lines that make up a rectangle to render
+    
+    // create array of vertices
+    glm::vec2 lineVertices[4];
+
+    // create the transform
+    glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(position, 0.0f)) 
+    * glm::rotate(glm::mat4(1.0f), rotation, {0.0f, 0.0f, 1.0f}) 
+    * glm::scale(glm::mat4(1.0f), {size.x, size.y, 0.0f});
+
+    // set the vertices
+    for(int i = 0; i < 4; i++){
+        lineVertices[i] = transform * quadVertexPositions[i];
+    }
+    
+    // store the lines to make up the rectangle into buffer
+
+    createLine(lineVertices[0], lineVertices[1], color);
+    createLine(lineVertices[1], lineVertices[2], color);
+    createLine(lineVertices[2], lineVertices[3], color);
+    createLine(lineVertices[3], lineVertices[0], color);
+}
+
 void LineRenderer::FlushLines(){
     //? check if buffer hasn't been set up
     if(lineBuffer == nullptr){
