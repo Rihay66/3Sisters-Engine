@@ -123,6 +123,9 @@ void QuadRenderer::FlushQuads(){
         //std::cout << "WARNING: No quad added to draw!\n";
         return; // stop function
     }
+    
+    // ensure shader usage
+    quadShader.Use();
 
     // draw the quad/s
     glBindVertexArray(quadVAO);

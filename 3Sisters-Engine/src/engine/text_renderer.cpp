@@ -138,6 +138,9 @@ void TextRenderer::FlushText(){
         return; // stop function
     }
     
+    // ensure shader usage
+    textShader.Use();
+    
     // draw the character/s
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, charVertexCount);

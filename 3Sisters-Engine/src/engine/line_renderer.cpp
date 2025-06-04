@@ -177,6 +177,9 @@ void LineRenderer::FlushLines(){
         //std::cout << "WARNING: No line added to draw!\n";
         return; // stop function
     }
+    
+    // ensure shader usage
+    lineShader.Use();
 
     // draw the line\s
     glBindVertexArray(lineVAO);
