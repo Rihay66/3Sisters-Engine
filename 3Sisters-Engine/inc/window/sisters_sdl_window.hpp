@@ -46,17 +46,17 @@ class Window{
 
         // private variable to track window quit event
         bool quit = false;
+        
+        // protected storage of SDL events
+        SDL_Event eventHandle;
 
-        // private storage of window handle
+    protected:
+        // protected storage of window handle
         SDL_Window* handle = nullptr;
 
-        // private storage of window context
+        // protected storage of window context
         SDL_GLContext context;
-
-        // private storage of SDL events
-        SDL_Event eventHandle;
-    
-    protected:
+        
         // used to set the target frame time between frame, aka max frame time
         void setTargetTimeStep(double time);
         
@@ -76,7 +76,12 @@ class Window{
          @Default is 2D rendering
         */
         virtual void setUpOpenGL();
+        
+        /* used for adding additional functionality when polling SDL events
 
+        */
+        virtual void additionalEventHandling(SDL_Event* event);
+        
         // used to retrieve how long a frame took
         double getFrameDuration() {return this->frameDuration;}
 

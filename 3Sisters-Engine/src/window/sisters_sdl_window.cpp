@@ -67,6 +67,10 @@ void Window::setUpOpenGL(){
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
+void Window::additionalEventHandling(SDL_Event* event){
+    // used to handle any additional SDL events
+}
+
 double Window::getDeltaTime(){
     return DeltaTime;
 } 
@@ -258,6 +262,8 @@ void Window::runtime(){
             default:    
                 break;
           }
+          // additional event handling
+          additionalEventHandling(&eventHandle);
         }
         
         //  accumulate time and do stepUpdate()

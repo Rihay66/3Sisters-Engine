@@ -41,10 +41,10 @@ class Window{
         // delta time variable for updating input, physics, and kind of movement
         double DeltaTime = 0;
 
+    protected:
         // window handle
         GLFWwindow* handle = nullptr;
-
-    protected:
+       
         // used to set the target frame time between frame, aka max frame time
         void setTargetTimeStep(double time);
         

@@ -11,7 +11,7 @@
 
 /* Entity Manager distribtutes entity IDs and
 keeps record of which entities are in use and
-which aren not.
+which are not.
 */
 class EntityManager{
     private:
