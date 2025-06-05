@@ -228,6 +228,42 @@ std::array<glm::vec2, 4>& TextureManager::GetSubTexture(std::string name){
     return SubTextures[name].TexCoords;
 }
 
+std::array<glm::vec2, 4>& TextureManager::GetSubTextureByIndex(int index){
+    //create sub texture pointer
+    SubTexture* st;
+    int iter = 0;
+    for(auto& subtex : SubTextures){
+        if(iter == index){
+            st = &subtex.second;
+            break;
+        }
+        iter++;
+    }
+    
+    // return coordinates
+    return st->TexCoords;
+}
+
+std::string TextureManager::GetSubTextureNameByIndex(int index){
+    //create sub texture pointer
+    std::string str;
+    int iter = 0;
+    for(auto& subtex : SubTextures){
+        if(iter == index){
+            str = subtex.first;
+            break;
+        }
+        iter++;
+    }
+    
+    // return coordinates
+    return str;
+}
+
+unsigned int TextureManager::GetSubTextureLength(){
+    return SubTextures.size();
+}
+
 bool TextureManager::BindTextures(){
     // check if the texure list is not zero
     if(texIDList.size() <= 0){

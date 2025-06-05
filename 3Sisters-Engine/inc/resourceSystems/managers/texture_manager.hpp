@@ -58,6 +58,15 @@ class TextureManager{
         
         // retrieve a stored sub texture
         static std::array<glm::vec2, 4>& GetSubTexture(std::string name);
+        
+        // retrieve a stored sub texture by index
+        static std::array<glm::vec2, 4>& GetSubTextureByIndex(int index);
+        
+        // retrieve a stored sub texture name by index
+        static std::string GetSubTextureNameByIndex(int index);
+        
+        // retrieve the size of all stored sub textures
+        static unsigned int GetSubTextureLength();
 
         //* helper functions
 
