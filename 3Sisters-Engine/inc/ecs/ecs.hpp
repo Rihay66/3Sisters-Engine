@@ -32,6 +32,11 @@ class ECS{
         // destroy given Entity and remove attached components
         static void DestroyEntity(Entity entity);
 
+        // get an existing entity's component signature
+        static Signature GetEntitySignature(Entity entity){
+            return entityManager->GetSignature(entity);
+        }
+        
         //* Component Functions
         
         // register specified component for entity and system usage
@@ -117,6 +122,55 @@ class ECS{
         template<typename T>
         static ComponentType GetComponentType(){
             return componentManager->GetComponentType<T>();
+        }
+        
+        // get signature of a component
+        template<typename T>
+        static Signature GetComponentSignature(){
+            // create signature to fill
+            Signature sig;
+            
+            // fill signature
+            sig.set(componentManager->GetComponentType<T>());
+            
+            // return the signature
+            return sig;
+        }
+        
+        // get a signature with given component types
+        template<typename... Args>
+        static Signature GetMultiComponentSignature(Args... args){
+            // check the amount of arguments to the max components
+            static_assert(sizeof...(args) < MAX_COMPONENTS, "ERROR: Too many specified component, the max is 32");
+
+            // check if args are of type ComponentType
+            static_assert((std::is_same_v<Args, ComponentType> && ...), "ERROR: Invalid signature argument as all component types are of std::uint8_t"); 
+            
+            // create signature to fill
+            Signature sig;
+            // get value and grab amount of all arguments
+            ComponentType arguments[] = { args... };
+
+            // loop through all arguments and populate signature
+            for(int i = 0; i < sizeof...(args); i++){
+                sig.set(arguments[i]);
+            }
+            
+            // return signature filled with given component types
+            return sig;
+        }
+        
+        // get signature bit of a component type
+        template<typename T>
+        static unsigned int GetComponentSignatureBit(){
+            // create signature to fill
+            Signature sig;
+            
+            // fill signature
+            sig.set(componentManager->GetComponentType<T>());
+            
+            // return the signature
+            return (unsigned int)sig.to_ulong();
         }
 
         //* System Functions
