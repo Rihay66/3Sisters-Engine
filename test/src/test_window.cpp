@@ -76,7 +76,8 @@ void TestWindow::stepUpdate(double ts){
 }
 
 void TestWindow::update(){
-
+    // poll gamepad inputs
+    GamepadManager::PollIO();
 }
 
 void TestWindow::render(double alpha){

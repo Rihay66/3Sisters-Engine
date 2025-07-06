@@ -1,4 +1,3 @@
-#include "glm/ext/matrix_transform.hpp"
 #include <engine/text_renderer.hpp>
 
 // additional GLM libraries
