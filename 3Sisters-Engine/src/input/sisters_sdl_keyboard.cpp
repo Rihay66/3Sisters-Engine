@@ -1,13 +1,11 @@
 #include <input/sisters_sdl_keyboard.hpp>
 
-// include keyboard manager
-#include <input/managers/sisters_sdl_keyboard_manager.hpp>
-
-using namespace SDL;
+// define global
+struct SDL::KeyboardStateHolder SDL::g_KeyboardState;
 
 bool SDL::getKeyInput(int key){
     // grab the keyboard state holder, then check for given scancode when pressed down
-    if(KeyboardManager::GetKeyboardState()->keyboardState[key] > 0){
+    if(SDL::g_KeyboardState.keyboardState[key] > 0){
         return true;
     }
 
@@ -16,7 +14,7 @@ bool SDL::getKeyInput(int key){
 
 bool SDL::getKeyInputDown(int key){
     // grab the keyboard state holder, then check for given scancode when pressed down
-    if(KeyboardManager::GetKeyboardState()->keyboardState[key] > 0){
+    if(SDL::g_KeyboardState.keyboardState[key] > 0){
         return true;
     }
 
@@ -25,7 +23,7 @@ bool SDL::getKeyInputDown(int key){
 
 bool SDL::getKeyInputUp(int key){
     // grab the keyboard state holder, then check for given scancode when not pressed
-    if(KeyboardManager::GetKeyboardState()->keyboardState[key] == 0){
+    if(SDL::g_KeyboardState.keyboardState[key] == 0){
         return true;
     }
 

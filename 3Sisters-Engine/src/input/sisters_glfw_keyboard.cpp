@@ -1,13 +1,11 @@
 #include <input/sisters_glfw_keyboard.hpp>
 
-// include Keyboard Manager
-#include <input/managers/sisters_glfw_keyboard_manager.hpp>
-
-using namespace GLFW;
+// define static global
+bool GLFW::g_KeyboardState[SISTER_KEY_LAST];
 
 bool GLFW::getKeyInput(int key){
     // check for input using GLFW
-    if(glfwGetKey(&KeyboardManager::GetWindowHandle(), key) == GLFW_PRESS){
+    if(GLFW::g_KeyboardState[key]){
         // return true if the key was pressed
         return true;
     }
@@ -18,7 +16,7 @@ bool GLFW::getKeyInput(int key){
 
 bool GLFW::getKeyInputDown(int key){
     // check for input using GLFW
-    if(glfwGetKey(&KeyboardManager::GetWindowHandle(), key) == GLFW_PRESS){
+    if(GLFW::g_KeyboardState[key]){
         // return true if the key was pressed
         return true;
     }
@@ -29,7 +27,7 @@ bool GLFW::getKeyInputDown(int key){
 
 bool GLFW::getKeyInputUp(int key){
     // check for input using GLFW
-    if(glfwGetKey(&KeyboardManager::GetWindowHandle(), key) == GLFW_RELEASE){
+    if(!GLFW::g_KeyboardState[key]){
         // return true if the key was pressed
         return true;
     }

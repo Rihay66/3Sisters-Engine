@@ -26,7 +26,7 @@ class Window{
             alpha = 0, threadSleepTime = 0;
 
         // vars storing and referencing to window size, width x height
-        unsigned int width = 0, height = 0;
+        int width = 0, height = 0;
 
         /* Fixed rate that updates the stepUpdate(), adjust accordingly as needed
          @Default value is 16.6ms
@@ -41,10 +41,10 @@ class Window{
         // delta time variable for updating input, physics, and kind of movement
         double DeltaTime = 0;
 
+    protected:
         // window handle
         GLFWwindow* handle = nullptr;
-
-    protected:
+       
         // used to set the target frame time between frame, aka max frame time
         void setTargetTimeStep(double time);
         

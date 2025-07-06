@@ -19,7 +19,9 @@ set(WINDOW
     src/window/sisters_sdl_window.cpp)
 
 set(STB 
-    src/stb/stb_image.cpp)
+    src/stb/stb_image.cpp
+    src/stb/stb_truetype.cpp
+    src/stb/stb_image_write.cpp)
 
 set(CAMERAS 
     src/cameras/ortho_camera.cpp)
@@ -27,31 +29,27 @@ set(CAMERAS
 set(RESOURCESYS
     src/resourceSystems/resource_shader.cpp
     src/resourceSystems/resource_texture.cpp
-    src/resourceSystems/managers/resource_manager.cpp)
+    src/resourceSystems/managers/shader_manager.cpp
+    src/resourceSystems/managers/texture_manager.cpp)
 
 set(ECS 
     src/ecs/ecs.cpp
-    src/ecs/managers/entity_manager.cpp
-    src/ecs/systems/ecs_sprite_renderer.cpp)
+    src/ecs/managers/entity_manager.cpp)
 
 set(INPUT
     src/input/sisters_sdl_gamepad.cpp
     src/input/sisters_glfw_gamepad.cpp
-    src/input/managers/sisters_glfw_gamepad_manager.cpp
-    src/input/managers/sisters_sdl_gamepad_manager.cpp
     src/input/sisters_sdl_keyboard.cpp
     src/input/sisters_glfw_keyboard.cpp
-    src/input/managers/sisters_glfw_keyboard_manager.cpp
-    src/input/managers/sisters_sdl_keyboard_manager.cpp)
+    src/input/sisters_sdl_mouse.cpp)
 
 set(SOUND 
-    src/sound/sound_buffer.cpp
-    src/sound/sound_device.cpp
-    src/sound/sound_source.cpp
-    src/sound/managers/sound_manager.cpp)
+    src/soundSystems/sound_source.cpp
+    src/soundSystems/managers/sound_manager.cpp)
 
 set(ENGINE 
-    src/engine/sprite_renderer.cpp
+    src/engine/line_renderer.cpp
+    src/engine/quad_renderer.cpp
     src/engine/text_renderer.cpp)
 
 # Create engine as a static library and add source files
@@ -64,7 +62,6 @@ add_subdirectory(vendor)
 
 # include all dependencies directories
 target_include_directories(3Sisters-Engine PRIVATE
-    vendor/freetype-src/include
     vendor/glfw-src/include
     vendor/glm-src
     vendor/openalsoft-src/include
@@ -73,7 +70,7 @@ target_include_directories(3Sisters-Engine PRIVATE
 )
 
 # include all dependencies
-target_link_libraries(3Sisters-Engine glm glfw freetype SDL3::SDL3-static OpenAL::OpenAL)
+target_link_libraries(3Sisters-Engine glm glfw SDL3::SDL3-static OpenAL::OpenAL sndfile)
 
 # Include directory for engine's headers
 set(ENGINE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/inc)

@@ -4,14 +4,9 @@ project(3Sisters-Engine-Testing VERSION 0.0.1 LANGUAGES C CXX)
 cmake_policy(SET CMP0072 NEW)
 
 # Include all files
-file(GLOB_RECURSE SOURCE_FILES
-    ${CMAKE_SOURCE_DIR}/test/src/*.c
-    ${CMAKE_SOURCE_DIR}/test/src/*.cpp
-)
-
-file(GLOB_RECURSE HEADER_FILES
-    ${CMAKE_SOURCE_DIR}/test/inc/*.h
-    ${CMAKE_SOURCE_DIR}/test/inc/*.hpp
+file(GLOB SOURCE_FILES
+    ${CMAKE_SOURCE_DIR}/test/src/main.cpp
+    ${CMAKE_SOURCE_DIR}/test/src/test_window.cpp
 )
 
 # Define resource folders
@@ -51,7 +46,6 @@ if(UNIX)
 
 # Create executable
 add_executable(3Sisters-Engine-Testing
-${HEADER_FILES}
 ${SOURCE_FILES}
 )
 
@@ -72,7 +66,6 @@ if(WIN32)
 
 # Create executable
 add_executable(3Sisters-Engine-Testing
-${HEADER_FILES}
 ${SOURCE_FILES}
 )
 

@@ -8,10 +8,6 @@
     #include <windows.h>
 #endif
 
-// include SDL based input headers
-#include <input/sisters_sdl_keyboard.hpp>
-#include <input/managers/sisters_sdl_gamepad_manager.hpp>
-
 // GLAD and SDL libraries
 #include <glad/glad.h>
 #include <SDL3/SDL.h>
@@ -29,6 +25,9 @@ class Window{
 	    double lastFrame = 0, currentFrame = 0, frameDuration = 0, accumulator = 0,
             alpha = 0, threadSleepTime = 0;
 
+        // vars for storing mouse wheel configuration
+        float mouseWheelStopSpeed = 0.25f, mouseWheelStopDeadzone = 0.5f;    
+        
         // vars storing and referencing to window size, width x height
         int width = 0, height = 0;
 
@@ -47,25 +46,28 @@ class Window{
 
         // private variable to track window quit event
         bool quit = false;
-
-        // private storage of window handle
-        SDL_Window* handle = nullptr;
-
-        // private storage of window context
-        SDL_GLContext context;
-
-        // private storage of SDL events
+        
+        // protected storage of SDL events
         SDL_Event eventHandle;
 
-        // private storage of keyboard state holder
-        KeyboardStateHolder* kState = nullptr;
-    
     protected:
+        // protected storage of window handle
+        SDL_Window* handle = nullptr;
+
+        // protected storage of window context
+        SDL_GLContext context;
+        
         // used to set the target frame time between frame, aka max frame time
         void setTargetTimeStep(double time);
         
         // used to set the fixed frame time between frame
         void setFixedTimeStep(double time);
+        
+        // used to set the mouse wheel stop speed
+        void setMouseWheelStopSpeed(float speed);
+        
+        // used to set the mouse wheel stop deadzone
+        void setMouseWheelStopDeadzone(float deadzone);
 
         // used for adding additional sdl window hints
         virtual void additionalWindowOptions();
@@ -74,7 +76,12 @@ class Window{
          @Default is 2D rendering
         */
         virtual void setUpOpenGL();
+        
+        /* used for adding additional functionality when polling SDL events
 
+        */
+        virtual void additionalEventHandling(SDL_Event* event);
+        
         // used to retrieve how long a frame took
         double getFrameDuration() {return this->frameDuration;}
 
@@ -106,11 +113,6 @@ class Window{
         * @NOTE: the event handle gets updated every frame 
         */
         SDL_Event& getEventState(){return this->eventHandle;}
-
-        /* returns a reference to the keyboard state holder that is updated by runtime()
-        *  
-        */
-        KeyboardStateHolder* getKeyboardState() {return this->kState;}
 
         /* returns reference of the window handle
         * @NOTE: initializeWindow() must be called otherwise this returns nullptr

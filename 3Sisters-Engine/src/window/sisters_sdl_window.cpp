@@ -1,4 +1,11 @@
+#include "SDL3/SDL_events.h"
+#include <cmath>
 #include <window/sisters_sdl_window.hpp>
+
+// include input headers
+#include <input/sisters_sdl_keyboard.hpp>
+#include <input/sisters_sdl_gamepad.hpp>
+#include <input/sisters_sdl_mouse.hpp>
 
 // include standard libraries
 #include <iostream>
@@ -12,9 +19,14 @@ Window::Window(){
 }
 
 Window::~Window(){
-    // delete the keyboard state holder
-    delete this->kState;
-
+    // close all created SDL joysticks
+    for(int i = 0; i < g_QueuedGamepads.size(); i++){
+        if(g_QueuedGamepads.at(i).gamepad->device != nullptr){
+            // then close the joystick
+            SDL_CloseGamepad(g_QueuedGamepads.at(i).gamepad->device);
+        }
+    }
+    
     SDL_GL_DestroyContext(context);
     SDL_DestroyWindow(handle);
     SDL_Quit();
@@ -36,6 +48,14 @@ void Window::setFixedTimeStep(double time){
     }
 }
 
+void Window::setMouseWheelStopSpeed(float speed){
+    this->mouseWheelStopSpeed = fabsf(speed);
+}
+
+void Window::setMouseWheelStopDeadzone(float deadzone){
+    this->mouseWheelStopDeadzone = fabsf(deadzone);
+}
+
 void Window::additionalWindowOptions(){
     // Disable v-sync
     SDL_GL_SetSwapInterval(0);
@@ -45,6 +65,10 @@ void Window::setUpOpenGL(){
     //set up rendering for 2D
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
+
+void Window::additionalEventHandling(SDL_Event* event){
+    // used to handle any additional SDL events
 }
 
 double Window::getDeltaTime(){
@@ -68,7 +92,10 @@ void Window::initializeWindow(int w, int h, const char* name){
     height = h;
     
     // Load default OpenGL
-    SDL_GL_LoadLibrary(NULL);
+    if(!SDL_GL_LoadLibrary(NULL)){
+        std::cout << "Failed to load default OpenGL!" << std::endl;
+        exit(-1);
+    }
 
     // check if using emscripten
     #ifdef __EMSCRIPTEN__
@@ -86,7 +113,7 @@ void Window::initializeWindow(int w, int h, const char* name){
 
     // create window handle
     handle = SDL_CreateWindow(name, w, h, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
-    if(handle == nullptr){
+    if(handle == nullptr || handle == NULL){
         std::cout << "Failed to create window!" << std::endl;
         exit(-1);
     }
@@ -110,15 +137,19 @@ void Window::initializeWindow(int w, int h, const char* name){
     }
     
     // set openGL window size
-    SDL_GetWindowSize(handle, &w, &h);
+    if(!SDL_GetWindowSize(handle, &w, &h)){
+        std::cout << "Failed to get SDL window size!" << std::endl;
+        exit(-1);
+    }
     glViewport(0, 0, w, h);
 
     // add additional OpenGL capabilities
     setUpOpenGL();
 
     // set up keyboard state holder
-    this->kState = new KeyboardStateHolder();
-    this->kState->keyboardState = (Uint8*)SDL_GetKeyboardState(NULL);
+    SDL::g_KeyboardState.keyboardState = (Uint8*)SDL_GetKeyboardState(NULL);
+
+    // show any errors or messages from SDL
 
     // TODO: Create debug options for the window class to display to a console
     // show any errors or messages
@@ -149,7 +180,7 @@ void Window::render(double alpha){
 // single threaded runtime of input(), update(), stepUpdate() and render()
 void Window::runtime(){
     // check if GLFW has been initialized
-    if(handle == nullptr || kState == nullptr){
+    if(handle == nullptr){
         //! display error
         std::cout << "ERROR: Window or keyboard state holder hasn't been initialized\n";
         return; // stop function
@@ -181,22 +212,75 @@ void Window::runtime(){
                 glViewport(0, 0, width, height);
 
                 break;
-            default:
+            case SDL_EVENT_GAMEPAD_ADDED:
+                // call for enable gamepad with the correspoding device
+                SDL::enableGamepad(eventHandle.gdevice.which);
+    
+                break;
+            case SDL_EVENT_GAMEPAD_REMOVED:
+                // disable the gamepad that was removed
+                SDL::disableGamepad(eventHandle.gdevice.which);
+    
+                break;
+            case SDL_EVENT_MOUSE_MOTION:
+                // update mouse position
+                SDL::g_MouseState.x = eventHandle.motion.x;
+                SDL::g_MouseState.y = eventHandle.motion.y;
+
+                break;
+            case SDL_EVENT_MOUSE_BUTTON_DOWN:
+                // enable button bit mask
+                SDL::g_MouseState.button ^= SISTER_MOUSE_BUTTON_MASK(eventHandle.button.button);
+                // check if button was double clicked
+                if(eventHandle.button.clicks >= 2){
+                    g_MouseState.isDoubleClicked = true;
+                }else{
+                    g_MouseState.isDoubleClicked = false;
+                }
+
+                break;
+            case SDL_EVENT_MOUSE_BUTTON_UP:
+                // disable button bit mask
+                SDL::g_MouseState.button ^= SISTER_MOUSE_BUTTON_MASK(eventHandle.button.button);
+
+                break;
+            case SDL_EVENT_MOUSE_WHEEL:
+                // get mouse wheel amount
+                SDL::g_MouseState.wheelY += eventHandle.wheel.y;
+                
+                break;
+            case SDL_EVENT_WINDOW_MOUSE_ENTER:
+                // set mouse within window to true
+                SDL::g_MouseState.isWithinWindow = true;
+
+                break;
+            case SDL_EVENT_WINDOW_MOUSE_LEAVE:
+                // set mouse within window to false
+                SDL::g_MouseState.isWithinWindow = false;
+
+                break;  
+            default:    
                 break;
           }
-
-          // check for device IO events, works only when GamepadManager is initialized
-          GamepadManager::PollIO();
+          // additional event handling
+          additionalEventHandling(&eventHandle);
         }
-
-        // grab the current keyboard state
-        this->kState->keyboardState = (uint8_t*)SDL_GetKeyboardState(NULL);
-
+        
         //  accumulate time and do stepUpdate()
         this->accumulator += this->DeltaTime;
         while(this->accumulator >= fixedTimeStep){
             // update with fixed time step
             stepUpdate(this->fixedTimeStep);
+            
+            // reduce mouse wheel amount
+            if(g_MouseState.wheelY > mouseWheelStopDeadzone){
+                g_MouseState.wheelY -= mouseWheelStopSpeed;
+            }else if(g_MouseState.wheelY < -mouseWheelStopDeadzone){
+                g_MouseState.wheelY += mouseWheelStopSpeed;
+            }else{
+                g_MouseState.wheelY = 0.0f;
+            }
+            
             accumulator -= fixedTimeStep;
         } 
         // calculate alpha for linear interpolation

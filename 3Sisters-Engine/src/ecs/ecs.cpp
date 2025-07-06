@@ -46,5 +46,6 @@ void ECS::DestroyEntity(Entity entity){
     componentManager->EntityDestroyed(entity);
 
     systemManager->EntityDestroyed(entity);
+    systemManager->EntitySignatureChange(entity, entityManager->GetSignature(entity));
 }
 
