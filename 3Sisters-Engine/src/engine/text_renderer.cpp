@@ -62,7 +62,7 @@ void TextRenderer::DrawCharacters(CharacterSet& set, std::string text, glm::vec3
     //? check if buffer hasn't been set up
     if(characterVertexBuffer == nullptr){
         //! Display error
-        std::cout << "ERRRO: Missing render buffer initialization!\n";
+        std::cout << "ERROR: Missing render buffer initialization!\n";
         return; // stop function
     }
     
@@ -90,7 +90,7 @@ void TextRenderer::StackCharacters(CharacterSet &set, std::string text, glm::vec
     //? check if buffer hasn't been set up
     if(characterVertexBuffer == nullptr){
         //! Display error
-        std::cout << "ERRRO: Missing render buffer initialization!\n";
+        std::cout << "ERROR: Missing render buffer initialization!\n";
         return; // stop function
     }
     
@@ -124,7 +124,7 @@ void TextRenderer::FlushText(){
     //? check if buffer hasn't been set up
     if(characterVertexBuffer == nullptr){
         //! Display error
-        std::cout << "ERRRO: Missing render buffer initialization!\n";
+        std::cout << "ERROR: Missing render buffer initialization!\n";
         return; // stop function
     }
     
@@ -133,7 +133,7 @@ void TextRenderer::FlushText(){
         // there are no characters to render
         //! Display Warning
         //TODO: Make a debug option to show this warning
-        std::cout << "WARNING: No characters added to draw!\n";
+        //std::cout << "WARNING: No characters added to draw!\n";
         return; // stop function
     }
     
