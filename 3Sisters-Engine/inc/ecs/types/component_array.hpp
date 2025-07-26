@@ -61,7 +61,7 @@ class ComponentArray : public IComponentArray{
                 return;
             }
 
-            // put a new neitity at end and update the maps
+            // put a new entity at end and update the maps
             size_t newIndex = size;
             entityToIndexMap[entity] = newIndex;
             indexToEntityMap[newIndex] = entity;
@@ -109,8 +109,7 @@ class ComponentArray : public IComponentArray{
 
         // remove an entity's component when destroyed
         void EntityDestroyed(Entity entity) override{
-            if (entityToIndexMap.find(entity) != entityToIndexMap.end())
-		    {
+            if (entityToIndexMap.find(entity) != entityToIndexMap.end()){
 			    RemoveData(entity);
 		    }
         }

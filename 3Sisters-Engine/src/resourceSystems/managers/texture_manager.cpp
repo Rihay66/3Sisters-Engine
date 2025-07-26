@@ -349,6 +349,12 @@ uint8_t* TextureManager::loadFontFromFile(CharacterSet* chars, const char* file,
     auto&& size = inputFileStream.tellg();
     inputFileStream.seekg(0, std::ios::beg);
 
+    // check size of file
+    if(size < 0){
+        std::cout << "ERROR: File size can't be determined!\n";
+        return 0;
+    }
+
     // allocate the buffer
     uint8_t* fontDataBuf = new uint8_t[static_cast<size_t>(size)];
 
