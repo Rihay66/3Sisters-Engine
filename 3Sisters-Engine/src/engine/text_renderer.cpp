@@ -65,16 +65,6 @@ void TextRenderer::DrawCharacters(CharacterSet& set, std::string text, glm::vec3
         std::cout << "ERROR: Missing render buffer initialization!\n";
         return; // stop function
     }
-    
-    // check opengl version
-    if(GLAD_GL_VERSION_4_5){
-        // bind texture
-        glBindTextureUnit(0, set.texID);
-    }else{
-        // bind texture
-        glBindTexture(GL_TEXTURE_2D, set.texID);
-        glActiveTexture(GL_TEXTURE0);
-    }
 
     // init the buffer
     beginCharacterBatch();
@@ -98,16 +88,6 @@ void TextRenderer::StackCharacters(CharacterSet &set, std::string text, glm::vec
     if(characterVertexBufferPtr == nullptr){
         // then initialize the batch
         beginCharacterBatch();
-    }
-    
-    // check opengl version
-    if(GLAD_GL_VERSION_4_5){
-        // bind texture
-        glBindTextureUnit(0, set.texID);
-    }else{
-        // bind texture
-        glBindTexture(GL_TEXTURE_2D, set.texID);
-        glActiveTexture(GL_TEXTURE0);
     }
     
     // if not then add characters to the buffer pointer
@@ -139,6 +119,9 @@ void TextRenderer::FlushText(){
     
     // ensure shader usage
     textShader.Use();
+
+    // rebind font textures
+    TextureManager::BindFontTextures();
     
     // draw the character/s
     glBindVertexArray(VAO);

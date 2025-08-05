@@ -74,6 +74,11 @@ class TextureManager{
         * @NOTE: is automatically called by LoadTexture()
         */
         static bool BindTextures();
+
+        /* binds all font textures (except regular textures) from the font list to be used by OpenGL
+        * @NOTE: is automatically called by LoadFontTexture()
+        */
+        static bool BindFontTextures();
         
     private:
         //TODO: Switch to use std::array

@@ -1,3 +1,4 @@
+#include "resourceSystems/resource_types.hpp"
 #include <resourceSystems/managers/texture_manager.hpp>
 
 #include <cstring>
@@ -290,6 +291,42 @@ bool TextureManager::BindTextures(){
             std::cout << "ERROR: Texture ID: " << texIDList[i] << " | Failed to be binded to index: " << i << "\n";
             return false; 
         }
+    }
+
+    //TODO: Make a flag that allows to display warnings
+
+    return true;
+}
+
+bool TextureManager::BindFontTextures(){
+    // check if the font list is not empty
+    if(Fonts.empty()){
+        std::cout << "ERROR: No font textures were loaded!" << std::endl;
+        return false;
+    }
+
+    //TODO: Allow for multiple fonts to be loaded
+
+    // bind all the font textures from first to last
+    int i = 0;
+    for(auto& pair : Fonts){
+        // check opengl version
+        if(GLAD_GL_VERSION_4_5){
+            // bind texture
+            glBindTextureUnit(0, pair.second.texID);
+        }else{
+            // bind texture
+            glActiveTexture(GL_TEXTURE0 + i);
+            glBindTexture(GL_TEXTURE_2D, pair.second.texID);
+        }
+        // check OpenGL errors
+        int errorCode = glGetError();
+        if(errorCode != GL_NO_ERROR){
+            std::cout << "ERROR: An error occured during binding texures, ERROR Code: " << errorCode << std::endl;
+            std::cout << "ERROR: Texture ID: " << pair.second.texID << " | Failed to be binded to index: " << i << "\n";
+            return false; 
+        }
+        i++;
     }
 
     //TODO: Make a flag that allows to display warnings such as this
