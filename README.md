@@ -1,10 +1,16 @@
-# Project-Heaven
-A Lightweight 2D OpenGL based Engine called:
 # 3Sisters-Engine
+A Lightweight 2D OpenGL based Framework/Engine for Graphics or Video Game Development. 
 
 ![](3Sisters_Engine_logo.png)
 
+# Why?
+
+This Framework/Engine was made to provide as an alternative to using popular Software to make graphics. The philosophy of this project is to both provide speed and ease of use when making anything allowing flexibility and peace of mind for developers by developers. 
+
+# State of the Project
+
 Current Version: 1.3-Release-Candidate
+
 Features:
 
 * Cross-platform building (Windows & Unix/Linux)
@@ -14,20 +20,27 @@ Features:
 * SDL2 and GLFW3 options
 * Controller-Support
 
-What's Coming?
+Currently this project is built in C/C++ and CMake which does hinder the previosly stated philosophy, however this project will be moving around in terms of in what it is developed on, how it can evolve into something more, and finding waays to keep things simple for not only anyone who works on the project but also those who want to use it.
 
-[] Documentation and Tutorial on how to use
+# The Future
 
-[] Unit Testing 
+Current Plans:
+* Current state will be labelled legacy to allow for easier reference and templating for future iterations 
+* Current state of legacy code will recieve documentation and hopefully very soon
+* Maintained until every current functionality has covered most edge cases
 
-[] Setup scripts 
+Future Plans:
+* Project will be rebuilt from the ground up in C with very little dependencies.
+* Project will stand as a base that can stand on its own and be used as a template for any forks of the project that focus on specific functionality
+* Project being rebuilt in C allows for porting into different languages like Rust, Java, Odin, and even Python allowing to reach different audiences and different developers who want to use it.
+* Project will always continue to OpenGL (either as a main API or fallback) and have the option for creating WebGL builds using Emscripten 
+* (Not fully planned yet or idea may be scrapped) have a flexible plugin system using Lua allowing for plugins that for example: Full Editor Mode, Model viewer, Mod support for stuff made with the project, custom scripting language, and a lot of cool stuff 
 
-[] Cross-platform development environments (Only Windows and Unix/Linux)
-
-[] Further Optimizations
+What is happening now? 
+* Project is undergoing changes, reorganization, and planning
 
 # Documentation
-This project's documentation will be in the works and is expected to be completed by the end of Fall 2024.
+This project is still in development, however they're in the works as the project matures.
 
 # Contribution
 This project has yet to include contributors, though GitHub issues can be made to highlight needed modifications or fixes to the engine.
