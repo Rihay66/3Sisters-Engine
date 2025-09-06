@@ -142,11 +142,15 @@ std::array<glm::vec2, 4>& TextureManager::GenerateSubTexture(std::string name, T
     glm::vec2 min = { (coordinates.x * cellSize.x) / (float)texture.GetWidth(), (coordinates.y * cellSize.y) / (float)texture.GetHeight()};
     glm::vec2 max = { ((coordinates.x + spriteSize.x) * cellSize.x) / (float)texture.GetWidth(), ((coordinates.y + spriteSize.y) * cellSize.y) / (float)texture.GetHeight()};
 
+    // calculate texture padding
+    float x_padding = (1.0f / (float)texture.GetWidth()) * 0.0001f;
+    float y_padding = (1.0f / (float)texture.GetHeight()) * 0.0001f;
+
     // set each tex coord the corresponding coordinates
-    st.TexCoords[0] = {min.x, min.y};
-    st.TexCoords[1] = {max.x, min.y};
-    st.TexCoords[2] = {max.x, max.y};
-    st.TexCoords[3] = {min.x, max.y};
+    st.TexCoords[0] = {min.x + x_padding, min.y + y_padding};
+    st.TexCoords[1] = {max.x - x_padding, min.y + y_padding};
+    st.TexCoords[2] = {max.x - x_padding, max.y - y_padding};
+    st.TexCoords[3] = {min.x + x_padding, max.y - y_padding};
 
     // store sub texture
     SubTextures[name] = st;

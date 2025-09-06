@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #ifndef COMPONENT_ARRAY_HPP
 #define COMPONENT_ARRAY_HPP
 
@@ -95,7 +96,14 @@ class ComponentArray : public IComponentArray{
         // return a reference of the entity's component
         T& GetData(Entity entity){
             if(debugOption == 'd' && entityToIndexMap.find(entity) == entityToIndexMap.end()){
-                throw std::invalid_argument("ERROR: Can't find entity with a component!");
+                // get name of component being looked for
+                const char* typeName = typeid(T).name();
+                // create error message to display
+                std::string errorMSG = "ERROR: Can't find entity with component: ";
+                errorMSG += typeName;
+                
+                // throw an exception, throws message and crashes the program
+                throw std::invalid_argument(errorMSG);
             }
 
             return componentArray[entityToIndexMap[entity]];
