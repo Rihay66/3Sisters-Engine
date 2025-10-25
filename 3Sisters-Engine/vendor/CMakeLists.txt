@@ -37,7 +37,7 @@ FetchContent_Declare(
 FetchContent_Declare(
     openalsoft
     GIT_REPOSITORY https://github.com/Rihay66/openal-soft.git
-    GIT_TAG master
+    GIT_TAG main
     GIT_SHALLOW TRUE
 )
 
