@@ -15,9 +15,8 @@ Features:
 
 * Cross-platform building (Windows & Unix/Linux)
 * Batch Rendering solution
-* OpenAL-based sound engine
 * Entity Component System
-* SDL2 and GLFW3 options
+* SDL3
 * Controller-Support
 
 Currently this project is built in C/C++ and CMake which does hinder the previosly stated philosophy, however this project will be moving around in terms of in what it is developed on, how it can evolve into something more, and finding waays to keep things simple for not only anyone who works on the project but also those who want to use it.
