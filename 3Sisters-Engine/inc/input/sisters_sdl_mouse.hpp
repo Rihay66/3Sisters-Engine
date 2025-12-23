@@ -36,14 +36,13 @@ bool getMouseInput(unsigned int button);
 bool getMouseDoubleInput(unsigned int button);
 
 // check for vertical mouse wheel
-float getMouseWheelY();
+float getMouseWheelYRaw();
 
 // check for vertical mouse wheel raw input
-bool getMouseWheelYRaw();
+bool getMouseWheelY();
 
 // check if mouse is within the window
 bool getMouseFocus();
 
 }
-
 #endif

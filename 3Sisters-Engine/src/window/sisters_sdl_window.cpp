@@ -1,6 +1,7 @@
-#include "SDL3/SDL_events.h"
-#include <cmath>
 #include <window/sisters_sdl_window.hpp>
+
+// include std math
+#include <cmath>
 
 // include input headers
 #include <input/sisters_sdl_keyboard.hpp>
@@ -266,7 +267,7 @@ void Window::runtime(){
           additionalEventHandling(&eventHandle);
         }
         
-        //  accumulate time and do stepUpdate()
+        // accumulate time and do stepUpdate()
         this->accumulator += this->DeltaTime;
         while(this->accumulator >= fixedTimeStep){
             // update with fixed time step

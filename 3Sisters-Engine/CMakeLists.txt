@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.28.0)
 set (CMAKE_CXX_STANDARD 20)
-project(3Sisters-Engine VERSION 0.1.2 LANGUAGES C CXX)
+project(3Sisters-Engine VERSION 0.1.3 LANGUAGES C CXX)
 cmake_policy(SET CMP0072 NEW)
 
 # Set the install prefix to the build folder's lib directory
@@ -41,7 +41,8 @@ set(INPUT
     src/input/sisters_glfw_gamepad.cpp
     src/input/sisters_sdl_keyboard.cpp
     src/input/sisters_glfw_keyboard.cpp
-    src/input/sisters_sdl_mouse.cpp)
+    src/input/sisters_sdl_mouse.cpp
+    src/input/sisters_glfw_mouse.cpp)
 
 set(SOUND 
     src/soundSystems/sound_source.cpp

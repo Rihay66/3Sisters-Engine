@@ -6,8 +6,8 @@
 #include <inttypes.h>
 #include <limits.h>
 
-#include "al.h"
-#include "alc.h"
+#include <AL/al.h>
+#include <AL/alc.h>
 #include <cstring>
 // include standard output library
 #include <iostream>

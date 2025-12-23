@@ -22,8 +22,11 @@ namespace GLFW{
 class Window{
     private:
         // set up vars for calculating delta time and the fixed time step
-	    double lastFrame = 0, currentFrame = 0, frameDuration = 0, accumulator = 0,
-            alpha = 0, threadSleepTime = 0;
+	      double lastFrame = 0, currentFrame = 0, frameDuration = 0, accumulator = 0,
+          alpha = 0, threadSleepTime = 0;
+
+        // vars for storing mouse wheel configuration
+        float mouseWheelStopSpeed = 0.25f, mouseWheelStopDeadzone = 0.5f;  
 
         // vars storing and referencing to window size, width x height
         int width = 0, height = 0;
@@ -50,6 +53,12 @@ class Window{
         
         // used to set the fixed frame time between frame
         void setFixedTimeStep(double time);
+
+        // used to set the mouse wheel stop speed
+        void setMouseWheelStopSpeed(float speed);
+        
+        // used to set the mouse wheel stop deadzone
+        void setMouseWheelStopDeadzone(float deadzone);
         
         // used for adding additional glfw window hints
         virtual void additionalWindowOptions();

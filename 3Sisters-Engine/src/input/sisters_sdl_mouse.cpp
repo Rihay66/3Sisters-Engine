@@ -1,5 +1,6 @@
 #include <input/sisters_sdl_mouse.hpp>
 
+// include std definitions
 #include <cstddef>
 
 // define global
@@ -41,11 +42,11 @@ bool SDL::getMouseDoubleInput(unsigned int button){
     return false;
 }
 
-float SDL::getMouseWheelY(){
+float SDL::getMouseWheelYRaw(){
     return g_MouseState.wheelY;
 }
 
-bool SDL::getMouseWheelYRaw(){
+bool SDL::getMouseWheelY(){
     if(g_MouseState.wheelY > 0.0f || g_MouseState.wheelY < 0.0f){
         return true;
     }

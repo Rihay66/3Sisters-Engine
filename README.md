@@ -9,7 +9,7 @@ This Framework/Engine was made to provide as an alternative to using popular Sof
 
 # State of the Project
 
-Current Version: 1.3-Release-Candidate
+Current Version: 1.3
 
 Features:
 

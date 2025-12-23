@@ -1,15 +1,19 @@
 #include <window/sisters_glfw_window.hpp>
 
-// include the namespace
-using namespace GLFW;
+// include std math
+#include <cmath>
 
 // include input headers
 #include <input/sisters_glfw_keyboard.hpp>
 #include <input/sisters_glfw_gamepad.hpp>
+#include <input/sisters_glfw_mouse.hpp>
 
 // include standard libraries
 #include <iostream>
 #include <chrono>
+
+// include the namespace
+using namespace GLFW;
 
 // callback function to move the OpenGL viewport to the GLFW window's position
 static void framebuffer_size_callback(GLFWwindow* window, int width, int height){
@@ -43,6 +47,29 @@ static void controller_connection_callback(int jid, int event){
         disableGamepad(jid);
     }  
 }
+
+static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos){
+    // get mouse position x and y
+    g_MouseState.x = xpos;
+    g_MouseState.y = ypos;
+}
+
+static void cursor_enter_callback(GLFWwindow* window, int entered){
+    // check if mouse is inside the window area
+    if(entered){
+        // set mouse to be within window
+        g_MouseState.isWithinWindow = true;
+    }else{
+        // set mouse not within window
+        g_MouseState.isWithinWindow = false;
+    }
+}
+
+void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yoffset){
+    // get mouse scroll wheel vertical
+    g_MouseState.wheelY = yoffset;
+}
+
 
 // constructor
 Window::Window() {
@@ -124,7 +151,18 @@ void Window::initializeWindow(int w, int h, const char* name){
     
     // throw ID into a connection or disconnect events
     glfwSetJoystickCallback(controller_connection_callback);
+
+    //* set up mouse callbacks
     
+    // mouse cursor position
+    glfwSetCursorPosCallback((GLFWwindow*)handle, cursor_position_callback);
+    
+    // mouse cursor is within the window area
+    glfwSetCursorEnterCallback((GLFWwindow*)handle, cursor_enter_callback);
+
+    // mouse vertical scroll wheel input
+    glfwSetScrollCallback((GLFWwindow*)handle, mouse_scroll_callback);
+
     // set openGL window size
     glViewport(0, 0, width, height);
 
@@ -150,6 +188,18 @@ void Window::setFixedTimeStep(double time){
         // set the fixed time step to given parameter
         this->fixedTimeStep = time;
     }
+}
+
+void Window::setMouseWheelStopSpeed(float speed){
+    this->mouseWheelStopSpeed = fabsf(speed);
+}
+
+void Window::setMouseWheelStopDeadzone(float deadzone){
+    // limit check to ensure range is [0.0f, 1.5f]
+    if(fabsf(deadzone) > 1.5f || fabsf(deadzone) < 0.5f){
+        deadzone = 0.5f;
+    }
+    this->mouseWheelStopDeadzone = fabsf(deadzone);
 }
 
 void Window::additionalWindowOptions(){
@@ -210,8 +260,11 @@ void Window::runtime(){
         return; // stop function
     }
     
-    //create local vars for timing
+    // create local vars for timing
     std::chrono::steady_clock::time_point frameStart, frameEnd;
+
+    // create local vars for mouse input
+    unsigned int state, button_mask; 
 
     // call init for resource initialization
     init();
@@ -234,14 +287,41 @@ void Window::runtime(){
             }
         }
 
-        // gran current window size
+        // loop through available mouse buttons and update mouse state
+        
+        // reset button mask
+        button_mask = 0;
+        for(int i = 0; i < GLFW_MOUSE_BUTTON_LAST; i++){
+            // obtain state of button
+            state = glfwGetMouseButton((GLFWwindow*)handle, i);
+            //? special check for first button
+            if(i == 0 && state){
+                button_mask = 1;
+            }
+            // set mouse button
+            button_mask |= (i << i) & (state << i);
+        }
+        // set mouse state buttons
+        g_MouseState.button = button_mask;
+
+        // set current window size
         glfwGetWindowSize((GLFWwindow*)handle, &width, &height);
         
-        //  accumulate time and do stepUpdate()
+        // accumulate time and do stepUpdate()
         this->accumulator += this->DeltaTime;
         while(this->accumulator >= fixedTimeStep){
             // update with fixed time step
             stepUpdate(this->fixedTimeStep);
+
+            // reduce mouse wheel amount
+            if(g_MouseState.wheelY > mouseWheelStopDeadzone){
+                g_MouseState.wheelY -= mouseWheelStopSpeed;
+            }else if(g_MouseState.wheelY < -mouseWheelStopDeadzone){
+                g_MouseState.wheelY += mouseWheelStopSpeed;
+            }else{
+                g_MouseState.wheelY = 0.0f;
+            }
+
             accumulator -= fixedTimeStep;
         } 
         // calculate alpha for linear interpolation
