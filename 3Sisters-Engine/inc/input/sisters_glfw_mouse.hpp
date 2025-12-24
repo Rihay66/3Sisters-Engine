@@ -32,10 +32,10 @@ void getMousePosition(double* x, double* y);
 // check for mouse button input
 bool getMouseInput(unsigned int button);
 
-// check for vertical mouse wheel
+// check for vertical mouse wheel raw input
 double getMouseWheelYRaw();
 
-// check for vertical mouse wheel raw input
+// check for vertical mouse wheel input
 bool getMouseWheelY();
 
 // check if mouse is within the window
