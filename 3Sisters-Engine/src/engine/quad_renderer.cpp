@@ -1,6 +1,8 @@
+#include "resourceSystems/resource_shader.hpp"
 #include <engine/quad_renderer.hpp>
 
 // standard library for debug outputs
+#include <exception>
 #include <iostream>
 
 // include additional GLM library
@@ -19,15 +21,12 @@ const std::array<glm::vec2, 4>      QuadRenderer::textureCoordinates = {{
         {1.0f, 1.0f},
         {0.0f, 1.0f}
     }};;
-// initialize quad buffer
-QuadRenderer::QuadVertex*             QuadRenderer::quadBuffer = nullptr;
-QuadRenderer::QuadVertex*             QuadRenderer::quadBufferPtr = nullptr;
-
 // initialize quad graphics data
 unsigned int                        QuadRenderer::quadVAO;
 unsigned int                        QuadRenderer::quadVBO;
 unsigned int                        QuadRenderer::quadEBO;
-unsigned int                        QuadRenderer::quadIndexCount;
+// initialize buffer stack
+std::map<unsigned int, QuadRenderer::BufferStack> QuadRenderer::bufferStacks;
 
 // initialize changeable shader
 Shader                              QuadRenderer::quadShader;
@@ -47,11 +46,19 @@ void QuadRenderer::Init(Shader& s){
     // set the shader reference
     quadShader = s;
 
+    // setup texture indexes
+    setupTextureIndexing(quadShader);
+
+    // set up rendering of quads
+    initQuadRenderData(); 
+}
+
+void QuadRenderer::setupTextureIndexing(Shader& shader){
     // set up shader samples for the quad textures
-    quadShader.Use();
+    shader.Use();
     
     // grab the uniform location of 'image' in the shader, the name 'image' is explicit
-    auto loc = glGetUniformLocation(quadShader.getID(), "image");
+    auto loc = glGetUniformLocation(shader.getID(), "image");
 
     // set up array to the size of the max number of textures
     int samplers[maxTextureSlots];
@@ -64,59 +71,163 @@ void QuadRenderer::Init(Shader& s){
 
     // set up the index of the shader's texture array
     glUniform1iv(loc, maxTextureSlots, samplers);
-
-    // set up rendering of quads
-    initQuadRenderData(); 
 }
 
 void QuadRenderer::DrawQuad(int texIndex, glm::vec2 pos, glm::vec2 size, float rot, glm::vec4 color,const std::array<glm::vec2, 4> texCoords ,const glm::vec4 vertexPositions[]){
     //? check if buffer hasn't been set up
-    if(quadBuffer == nullptr){
+    if(bufferStacks[0].buffer == nullptr){
         //! Display error
-        std::cout << "ERROR: Missing quad render quad buffer initialization!\n";
+        std::cout << "ERROR: Missing quad render buffer initialization!\n";
         return; // stop function
     }
 
     // init the buffer
-    beginQuadBatch();
+    beginQuadBatch(0);
 
-    // create the quad to render
-    createQuad(pos, size, rot, texIndex, color, texCoords, vertexPositions);
+    // create the quad to render, use default buffer stack and shader
+    createQuad(0, quadShader,pos, size, rot, texIndex, color, texCoords, vertexPositions);
 
     // render
     FlushQuads();
 }
 
+void QuadRenderer::DrawQuad(Shader& shader, int texIndex, glm::vec2 pos, glm::vec2 size, float rot, glm::vec4 color,const std::array<glm::vec2, 4> texCoords ,const glm::vec4 vertexPositions[]){
+    //? check if buffer hasn't been set up
+    if(bufferStacks[0].buffer == nullptr){
+        //! Display error
+        std::cout << "ERROR: Missing quad render buffer initialization!\n";
+        return; // stop function
+    }
+
+    // init the buffer
+    beginQuadBatch(0);
+
+    // create the quad to render, use default buffer stack and given shader
+    createQuad(0, shader,pos, size, rot, texIndex, color, texCoords, vertexPositions);
+
+    // render
+    FlushQuads(shader);
+}   
+
 void QuadRenderer::StackQuad(int texIndex, glm::vec2 pos, glm::vec2 size, float rot, glm::vec4 color, const std::array<glm::vec2, 4> texCoords, const glm::vec4 vertexPositions[]){
     //? check if buffer hasn't been set up
-    if(quadBuffer == nullptr){
+    if(bufferStacks[0].buffer == nullptr){
         //! Display error
         std::cout << "ERROR: Missing quad render buffer initialization!\n";
         return; // stop function
     }
 
     // check if the buffer pointer hasn't been set up
-    if(quadBufferPtr == nullptr){
-        // then initialize the batch
-        beginQuadBatch();
+    if(bufferStacks[0].bufferPtr == nullptr){
+        // then initialize the batch, use default selection
+        beginQuadBatch(0);
     }
 
     // if not then add a quad to the buffer pointer
 
-    // create the quad to render
-    createQuad(pos, size, rot, texIndex, color, texCoords, vertexPositions);
+    // create the quad to render, use default buffer stack and shader
+    createQuad(0, quadShader,pos, size, rot, texIndex, color, texCoords, vertexPositions);
 }
 
-void QuadRenderer::FlushQuads(){
+void QuadRenderer::StackQuad(unsigned int bufferSelectionID, int texIndex, glm::vec2 pos, glm::vec2 size, float rot, glm::vec4 color, const std::array<glm::vec2, 4> texCoords, const glm::vec4 vertexPositions[]){
+    //? check if stack already exists
+    try{   
+        // attempt to access buffer
+        if(bufferStacks.at(bufferSelectionID).buffer == nullptr){
+            //std::cout << "MSG: new buffer stack made\n";
+            //? initialize buffer stack
+            bufferStacks[bufferSelectionID].buffer = new QuadVertex[maxQuadVertexCount];
+
+            //std::cout << "MSG: Buffer Stack size: " << bufferStacks.size() << "\n";
+        }
+    }catch(const std::out_of_range& e){
+        // upon out of range exception then create new buffer selection
+        bufferStacks.insert({bufferSelectionID, BufferStack{.buffer = new QuadVertex[maxQuadVertexCount]}});
+        // debug
+        //std::cout << "MSG: Created a new buffer stack with selection ID of: " << bufferSelectionID << "\n";
+    }
+    catch(...){
+        // not a out of range exception
+        //! print out error
+        std::cout << "ERROR: Missing quad render buffer initialization!\n";
+
+        return; // stop function
+    }
+    
     //? check if buffer hasn't been set up
-    if(quadBuffer == nullptr){
+    if(bufferStacks[bufferSelectionID].buffer == nullptr){
         //! Display error
         std::cout << "ERROR: Missing quad render buffer initialization!\n";
         return; // stop function
     }
 
+    // check if the buffer pointer hasn't been set up
+    if(bufferStacks[bufferSelectionID].bufferPtr == nullptr){
+        // then initialize the batch, use default selection
+        beginQuadBatch(bufferSelectionID);
+    }
+
+    // if not then add a quad to the buffer pointer
+
+    // create the quad to render, use default buffer stack and shader
+    createQuad(bufferSelectionID, quadShader,pos, size, rot, texIndex, color, texCoords, vertexPositions);
+}
+
+
+void QuadRenderer::StackQuad(unsigned int bufferSelectionID, Shader& shader, int texIndex, glm::vec2 pos, glm::vec2 size, float rot, glm::vec4 color, const std::array<glm::vec2, 4> texCoords, const glm::vec4 vertexPositions[]){
+    //? check if stack already exists
+    try{   
+        // attempt to access buffer
+        if(bufferStacks.at(bufferSelectionID).buffer == nullptr){
+            //std::cout << "MSG: new buffer stack made\n";
+            //? initialize buffer stack
+            bufferStacks[bufferSelectionID].buffer = new QuadVertex[maxQuadVertexCount];
+
+            //std::cout << "MSG: Buffer Stack size: " << bufferStacks.size() << "\n";
+        }
+    }catch(const std::out_of_range& e){
+        // upon out of range exception then create new buffer selection
+        bufferStacks.insert({bufferSelectionID, BufferStack{.buffer = new QuadVertex[maxQuadVertexCount]}});
+        // debug
+        //std::cout << "MSG: Created a new buffer stack with selection ID of: " << bufferSelectionID << "\n";
+    }
+    catch(...){
+        // not a out of range exception
+        //! print out error
+        std::cout << "ERROR: Missing quad render buffer initialization!\n";
+
+        return; // stop function
+    }
+    
+    //? check if buffer hasn't been set up
+    if(bufferStacks[bufferSelectionID].buffer == nullptr){
+        //! Display error
+        std::cout << "ERROR: Missing quad render buffer initialization!\n";
+        return; // stop function
+    }
+
+    // check if the buffer pointer hasn't been set up
+    if(bufferStacks[bufferSelectionID].bufferPtr == nullptr){
+        // then initialize the batch, use default selection
+        beginQuadBatch(bufferSelectionID);
+    }
+
+    // if not then add a quad to the buffer pointer
+
+    // create the quad to render, use default buffer stack and shader
+    createQuad(bufferSelectionID, shader,pos, size, rot, texIndex, color, texCoords, vertexPositions);
+}
+
+void QuadRenderer::FlushQuads(Shader& shader, unsigned int bufferSelectionID){
+    //? check if buffer hasn't been set up
+    if(bufferStacks[bufferSelectionID].buffer == nullptr){
+        //! Display error
+        //std::cout << "ERROR: Missing quad render buffer initialization!\n";
+        return; // stop function
+    }
+
     // set up vertex dynamic buffer
-    if(!endQuadBatch()){
+    if(!endQuadBatch(bufferSelectionID)){
         // there are no quads to render
         //! Display Warning
         //TODO: Make a debug option to show this warning
@@ -125,25 +236,35 @@ void QuadRenderer::FlushQuads(){
     }
     
     // ensure shader usage
-    quadShader.Use();
+    shader.Use();
 
     // draw the quad/s
     glBindVertexArray(quadVAO);
-    glDrawElements(GL_TRIANGLES, quadIndexCount, GL_UNSIGNED_INT, nullptr);
+    glDrawElements(GL_TRIANGLES, bufferStacks[bufferSelectionID].indexCount, GL_UNSIGNED_INT, nullptr);
 
     // reset buffer pointer
-    quadBufferPtr = nullptr;
+    bufferStacks[bufferSelectionID].bufferPtr = nullptr;
 
     // reset index count
-    quadIndexCount = 0;
+    bufferStacks[bufferSelectionID].indexCount = 0;
 }
 
-void QuadRenderer::createQuad(glm::vec2& pos, glm::vec2& size, float& rotation, int& texIndex, glm::vec4& color, const std::array<glm::vec2, 4> texCoords,const glm::vec4 vertexPositions[]){
+void QuadRenderer::createQuad(unsigned int bufferSelectionID, Shader& shader, glm::vec2& pos, glm::vec2& size, float& rotation, int& texIndex, glm::vec4& color, const std::array<glm::vec2, 4> texCoords,const glm::vec4 vertexPositions[]){
+    // obtain reference to buffer stack
+    BufferStack* stack = &bufferStacks[bufferSelectionID];
+    
+    // check if given stack is valid
+    if(stack == nullptr || stack->buffer == nullptr){
+        //! print error
+        std::cout << "ERORR: Given an NULL buffer stack for creating quads!\n" <<  std::endl;
+        return; // stop function
+    }
+
     // check if not over the index count
-    if (quadIndexCount >= maxQuadIndexCount){
+    if (stack->indexCount >= maxQuadIndexCount){
         // flush what's left and start another batch
-        FlushQuads();  
-        beginQuadBatch();
+        FlushQuads(shader, bufferSelectionID);  
+        beginQuadBatch(bufferSelectionID);
     }
 
     // create model transform
@@ -151,41 +272,37 @@ void QuadRenderer::createQuad(glm::vec2& pos, glm::vec2& size, float& rotation, 
     * glm::rotate(glm::mat4(1.0f), glm::radians(rotation), {0.0f, 0.0f, 1.0f}) 
     * glm::scale(glm::mat4(1.0f), {size.x, size.y, 0.0f});
 
-    quadBufferPtr->position = (transform * vertexPositions[0]);
-    quadBufferPtr->texCoords = texCoords[0];
-    quadBufferPtr->texIndex = texIndex;
-    quadBufferPtr->color = color;
-    quadBufferPtr++;
+    stack->bufferPtr->position = (transform * vertexPositions[0]);
+    stack->bufferPtr->texCoords = texCoords[0];
+    stack->bufferPtr->texIndex = texIndex;
+    stack->bufferPtr->color = color;
+    stack->bufferPtr++;
 
-    quadBufferPtr->position = (transform * vertexPositions[1]);
-    quadBufferPtr->texCoords = texCoords[1];
-    quadBufferPtr->texIndex = texIndex;
-    quadBufferPtr->color = color;
-    quadBufferPtr++;
+    stack->bufferPtr->position = (transform * vertexPositions[1]);
+    stack->bufferPtr->texCoords = texCoords[1];
+    stack->bufferPtr->texIndex = texIndex;
+    stack->bufferPtr->color = color;
+    stack->bufferPtr++;
 
-    quadBufferPtr->position = (transform * vertexPositions[2]);
-    quadBufferPtr->texCoords = texCoords[2];
-    quadBufferPtr->texIndex = texIndex;
-    quadBufferPtr->color = color;
-    quadBufferPtr++;
+    stack->bufferPtr->position = (transform * vertexPositions[2]);
+    stack->bufferPtr->texCoords = texCoords[2];
+    stack->bufferPtr->texIndex = texIndex;
+    stack->bufferPtr->color = color;
+    stack->bufferPtr++;
 
-    quadBufferPtr->position = (transform * vertexPositions[3]);
-    quadBufferPtr->texCoords = texCoords[3];
-    quadBufferPtr->texIndex = texIndex;
-    quadBufferPtr->color = color;
-    quadBufferPtr++;
+    stack->bufferPtr->position = (transform * vertexPositions[3]);
+    stack->bufferPtr->texCoords = texCoords[3];
+    stack->bufferPtr->texIndex = texIndex;
+    stack->bufferPtr->color = color;
+    stack->bufferPtr++;
 
-    quadIndexCount += 6;
+    stack->indexCount += 6;
 }
 
 // Set up the quad rendering
 void QuadRenderer::initQuadRenderData(){
-    // check if quad buffer had already been initialized
-    if (quadBuffer != nullptr)
-        exit(-1); // avoid re-initalize of the render data
-
-    // configure buffer
-    quadBuffer = new QuadVertex[maxQuadVertexCount];
+    // create default buffer stack
+    bufferStacks.insert({0, BufferStack{.buffer = new QuadVertex[maxQuadVertexCount]}});
 
     // indices buffer data
     unsigned int indices[maxQuadIndexCount];
@@ -266,17 +383,15 @@ void QuadRenderer::initQuadRenderData(){
     }
 }
 
-void QuadRenderer::beginQuadBatch(){
-    // set buffer pointer
-    quadBufferPtr = quadBuffer;
-
-    // call shader usage
-    quadShader.Use();
+void QuadRenderer::beginQuadBatch(unsigned int bufferSelectionID){
+    // set buffer pointer for a buffer stack
+    bufferStacks[bufferSelectionID].bufferPtr = bufferStacks[bufferSelectionID].buffer;
 }
 
-bool QuadRenderer::endQuadBatch(){
+bool QuadRenderer::endQuadBatch(unsigned int bufferSelectionID){
     // calculate amount of quads to render
-    GLsizeiptr size = (uint8_t*)quadBufferPtr - (uint8_t*)quadBuffer;
+    GLsizeiptr size = (uint8_t*)bufferStacks[bufferSelectionID].bufferPtr 
+                            - (uint8_t*)bufferStacks[bufferSelectionID].buffer;
     if(size < 0){
         // no quads available
         return false;
@@ -285,11 +400,11 @@ bool QuadRenderer::endQuadBatch(){
     // check opengl version
     if(GLAD_GL_VERSION_4_5){
         // set up dynamic buffer
-        glNamedBufferSubData(quadVBO, 0, size, quadBuffer);
+        glNamedBufferSubData(quadVBO, 0, size, (uint8_t*)bufferStacks[bufferSelectionID].buffer);
     }else{
         // set up dynamic buffer
         glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, size, quadBuffer);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, size, (uint8_t*)bufferStacks[bufferSelectionID].buffer);
     }
 
     // batch is fully set up
@@ -297,10 +412,12 @@ bool QuadRenderer::endQuadBatch(){
 }
 
 void QuadRenderer::clear(){
-    // delete all quad buffers
-    delete[] quadBuffer;
-    quadBufferPtr = nullptr;
-    delete quadBufferPtr;
+    // delete all quad buffer stacks
+    for(auto& iter : bufferStacks){
+        delete [] iter.second.buffer;
+        iter.second.bufferPtr = nullptr;
+        delete iter.second.bufferPtr;
+    }
 
     // delete quad buffer data
     glDeleteVertexArrays(1, &quadVAO);

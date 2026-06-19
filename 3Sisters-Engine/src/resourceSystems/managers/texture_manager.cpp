@@ -317,7 +317,7 @@ bool TextureManager::BindFontTextures(){
         // check opengl version
         if(GLAD_GL_VERSION_4_5){
             // bind texture
-            glBindTextureUnit(0, pair.second.texID);
+            glBindTextureUnit(i, pair.second.texID);
         }else{
             // bind texture
             glActiveTexture(GL_TEXTURE0 + i);

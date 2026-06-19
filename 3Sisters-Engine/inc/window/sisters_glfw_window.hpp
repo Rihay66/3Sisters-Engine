@@ -44,9 +44,16 @@ class Window{
         // delta time variable for updating input, physics, and kind of movement
         double DeltaTime = 0;
 
+        // track auto clear
+        bool isAutoClearSet = false;
+
+        // define cleaning functions
+        static void clear();
+        void setUpAutoClear();
+
     protected:
         // window handle
-        GLFWwindow* handle = nullptr;
+        static GLFWwindow* handle;
        
         // used to set the target frame time between frame, aka max frame time
         void setTargetTimeStep(double time);

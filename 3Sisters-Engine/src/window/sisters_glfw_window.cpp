@@ -15,6 +15,9 @@
 // include the namespace
 using namespace GLFW;
 
+// define static variables
+GLFWwindow* Window::handle = nullptr;
+
 // callback function to move the OpenGL viewport to the GLFW window's position
 static void framebuffer_size_callback(GLFWwindow* window, int width, int height){
     glViewport(0, 0, width, height);
@@ -73,16 +76,13 @@ void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yoffset){
 
 // constructor
 Window::Window() {
-    
+    //setup auto cleaning
+    setUpAutoClear();
 }
 
 // destructor
 Window::~Window(){
-    // destroy window handle
-    glfwDestroyWindow(handle);
-
-    // delete any pointers
-    glfwTerminate();
+    
 }
 
 void Window::initializeWindow(int w, int h, const char* name){
@@ -354,5 +354,20 @@ void Window::runtime(){
             // sleep
             while (std::chrono::high_resolution_clock::now() < end){}
         }
+    }
+}
+
+void Window::clear(){
+    // destroy window handle
+    glfwDestroyWindow(handle);
+
+    // delete any pointers
+    glfwTerminate();
+}
+
+void Window::setUpAutoClear(){
+    // set up on exit to call the Clear()
+    if(!isAutoClearSet && std::atexit(clear) == 0){
+        isAutoClearSet = true; // disable calling this function again
     }
 }

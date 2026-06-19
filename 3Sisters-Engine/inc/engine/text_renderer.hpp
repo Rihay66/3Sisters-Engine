@@ -14,6 +14,12 @@
 #include <resourceSystems/resource_types.hpp>
 #include <resourceSystems/resource_shader.hpp>
 
+// define text alingment
+typedef enum {
+    LEFT_ALIGN = 0,
+    CENTER_ALIGN
+} TEXT_ALINGMENT;
+
 /* A static singleton Text Renderer Class used to render text
  with a given CharacterSet otherwise recognized simply as a font.
  This class utilizes batch rendering when rendering a stack of 
@@ -28,18 +34,32 @@ class TextRenderer{
         //* draw render function
         
         /* used to draw text on the screen using a loaded font
+            @ Default text alignment is: left align
             @ Recommended to use a CharacterSet loaded through from the ResourceManager
         */ 
         static void DrawCharacters(CharacterSet& set, std::string text, glm::vec3 position, float rotation, float size, glm::vec4 color = glm::vec4(1.0f));
         
+        /* used to draw text on the screen using a loaded font and with text alingment
+            @ Recommended to use a CharacterSet loaded through from the ResourceManager
+        */ 
+        static void DrawCharacters(TEXT_ALINGMENT alignment, CharacterSet& set, std::string text, glm::vec3 position, float rotation, float size, glm::vec4 color = glm::vec4(1.0f));
+
         //* stack render function
         
         /* used to draw text on the screen using a loaded font
+            @ Default text alignment is: left align
             @ Recommended to use a CharacterSet loaded through from the ResourceManager
             !If using multiple fonts, stack and flush for each particular font being used, you can't mix different fonts when stacking
         */
         static void StackCharacters(CharacterSet& set, std::string text, glm::vec3 position, float rotation, float size, glm::vec4 color = glm::vec4(1.0f));
         
+        /* used to draw text on the screen using a loaded font and with text alingment
+            @ Default text alignment is: left align
+            @ Recommended to use a CharacterSet loaded through from the ResourceManager
+            !If using multiple fonts, stack and flush for each particular font being used, you can't mix different fonts when stacking
+        */
+        static void StackCharacters(TEXT_ALINGMENT alignment, CharacterSet& set, std::string text, glm::vec3 position, float rotation, float size, glm::vec4 color = glm::vec4(1.0f));
+
         //* setter functions
         
         // set the window height, which is used to calculate the pixel scale of the rendered text
@@ -62,7 +82,7 @@ class TextRenderer{
         static Shader textShader;
         
         // stores data of a quad
-        static unsigned int VAO, VBO, window_height;
+        static unsigned int textVAO, textVBO, window_height;
         
         // counter to track the number of vertices of quads
         static unsigned int charVertexCount;
@@ -89,7 +109,7 @@ class TextRenderer{
         
         //* primative craetion functions
         
-        static void createCharacter(CharacterSet& set, std::string text, glm::vec3 position, float rotation, float size, glm::vec4 color);
+        static void createCharacter(TEXT_ALINGMENT alingment,CharacterSet& set, std::string text, glm::vec3 position, float rotation, float size, glm::vec4 color);
         
         //* Batch functions
         

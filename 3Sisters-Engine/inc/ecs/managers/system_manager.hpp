@@ -90,9 +90,9 @@ class SystemManager{
 
         // notify each system that a entity's signature has changed
         void EntitySignatureChange(Entity entity, Signature entitySignature){
-            for(auto const& pair : systems){
-                auto const& type = pair.first;
-                auto const& system = pair.second;
+            for(const auto& [key, value] : systems){
+                auto const& type = key;
+                auto const& system = value;
                 auto const& systemSignature = signatures[type];
 
                 // check if the entity signature change needs to be added or removed

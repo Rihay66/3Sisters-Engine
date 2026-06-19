@@ -15,22 +15,17 @@
 
 using namespace SDL;
 
-Window::Window(){
+// define static variables
+SDL_Window* Window::handle = nullptr;
+SDL_GLContext Window::context;
 
+Window::Window(){
+    // setup auto cleaning
+    setUpAutoClear();
 }
 
 Window::~Window(){
-    // close all created SDL joysticks
-    for(int i = 0; i < g_QueuedGamepads.size(); i++){
-        if(g_QueuedGamepads.at(i).gamepad->device != nullptr){
-            // then close the joystick
-            SDL_CloseGamepad(g_QueuedGamepads.at(i).gamepad->device);
-        }
-    }
     
-    SDL_GL_DestroyContext(context);
-    SDL_DestroyWindow(handle);
-    SDL_Quit();
 }
 
 void Window::setTargetTimeStep(double time){
@@ -319,5 +314,27 @@ void Window::runtime(){
         lastFrame = SDL_GetPerformanceCounter();
         // calculate deltatime 
         DeltaTime = (lastFrame - currentFrame) / (double)SDL_GetPerformanceFrequency();
+    }
+}
+
+// Window clean function
+void Window::clear(){
+    // close all created SDL joysticks
+    for(int i = 0; i < g_QueuedGamepads.size(); i++){
+        if(g_QueuedGamepads.at(i).gamepad->device != nullptr){
+            // then close the joystick
+            SDL_CloseGamepad(g_QueuedGamepads.at(i).gamepad->device);
+        }
+    }
+    
+    SDL_GL_DestroyContext(context);
+    SDL_DestroyWindow(handle);
+    SDL_Quit();
+}
+
+void Window::setUpAutoClear(){
+    // set up on exit to call the Clear()
+    if(!isAutoClearSet && std::atexit(clear) == 0){
+        isAutoClearSet = true; // disable calling this function again
     }
 }

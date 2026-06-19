@@ -20,8 +20,8 @@ TextRenderer::CharacterVertex*      TextRenderer::characterVertexBuffer = nullpt
 TextRenderer::CharacterVertex*      TextRenderer::characterVertexBufferPtr = nullptr;
 
 // init character graphics data
-unsigned int    TextRenderer::VAO;
-unsigned int    TextRenderer::VBO;
+unsigned int    TextRenderer::textVAO;
+unsigned int    TextRenderer::textVBO;
 unsigned int    TextRenderer::charVertexCount = 0;
 unsigned int    TextRenderer::window_height = 0;
 
@@ -70,7 +70,25 @@ void TextRenderer::DrawCharacters(CharacterSet& set, std::string text, glm::vec3
     beginCharacterBatch();
     
     // create the text to render
-    createCharacter(set, text, position, rotation, size, color);
+    createCharacter(LEFT_ALIGN,set, text, position, rotation, size, color);
+    
+    // render
+    FlushText();
+}
+
+void TextRenderer::DrawCharacters(TEXT_ALINGMENT alignment, CharacterSet& set, std::string text, glm::vec3 position, float rotation, float size, glm::vec4 color){
+    //? check if buffer hasn't been set up
+    if(characterVertexBuffer == nullptr){
+        //! Display error
+        std::cout << "ERROR: Missing render buffer initialization!\n";
+        return; // stop function
+    }
+
+    // init the buffer
+    beginCharacterBatch();
+    
+    // create the text to render
+    createCharacter(alignment,set, text, position, rotation, size, color);
     
     // render
     FlushText();
@@ -93,7 +111,27 @@ void TextRenderer::StackCharacters(CharacterSet &set, std::string text, glm::vec
     // if not then add characters to the buffer pointer
     
     // create the text to render
-    createCharacter(set, text, position, rotation, size, color);
+    createCharacter(LEFT_ALIGN,set, text, position, rotation, size, color);
+}
+
+void TextRenderer::StackCharacters(TEXT_ALINGMENT alignment, CharacterSet &set, std::string text, glm::vec3 position, float rotation, float size, glm::vec4 color){
+    //? check if buffer hasn't been set up
+    if(characterVertexBuffer == nullptr){
+        //! Display error
+        std::cout << "ERROR: Missing render buffer initialization!\n";
+        return; // stop function
+    }
+    
+    // check if the buffer pointer hasn't been set up
+    if(characterVertexBufferPtr == nullptr){
+        // then initialize the batch
+        beginCharacterBatch();
+    }
+    
+    // if not then add characters to the buffer pointer
+    
+    // create the text to render
+    createCharacter(alignment,set, text, position, rotation, size, color);
 }
 
 void TextRenderer::SetWindowHeight(unsigned int height){
@@ -124,7 +162,7 @@ void TextRenderer::FlushText(){
     TextureManager::BindFontTextures();
     
     // draw the character/s
-    glBindVertexArray(VAO);
+    glBindVertexArray(textVAO);
     glDrawArrays(GL_TRIANGLES, 0, charVertexCount);
     
     // reset buffer pointer
@@ -137,12 +175,39 @@ void TextRenderer::FlushText(){
     TextureManager::BindTextures();
 }
 
-void TextRenderer::createCharacter(CharacterSet& set, std::string text, glm::vec3 position, float rotation, float size, glm::vec4 color){     
+void TextRenderer::createCharacter(TEXT_ALINGMENT alingment, CharacterSet& set, std::string text, glm::vec3 position, float rotation, float size, glm::vec4 color){     
     // calculate pixel scale
     float pixelScale = 2.0f / window_height;
     
     // local storage of the position for each glyph
     glm::vec3 localPosition = position;
+
+    // local storage of offset for all glyphs
+    
+    // check if alingment is anyother
+    switch(alingment){
+        case LEFT_ALIGN:
+            break;
+        case CENTER_ALIGN:
+            // calculate width and apply center alignment offset
+            {
+                // calculate total width of all glyphs in text
+                float width = 0.0f;
+                for(char ch : text){
+                    if(ch >= codePointOfFirstChar && ch <= codePointOfFirstChar + charsToIncludeInFontAtlas){
+                        // Retrive the data that is used to render a glyph of character 'ch'
+                        stbtt_packedchar* packedChar = &set.packedChars[ch - codePointOfFirstChar]; 
+                        // add to the width
+                        width += packedChar->xadvance * pixelScale * size;
+                    }
+                }
+                // then calculate half of the width and apply to 
+                localPosition.x -= (width / 2.0f);
+            }
+            break;
+        default:
+            break;
+    }
     
     for(char ch : text){
         // cehck if the charecter glyph is in the font atlas
@@ -153,7 +218,7 @@ void TextRenderer::createCharacter(CharacterSet& set, std::string text, glm::vec
                 beginCharacterBatch();
             }
             
-            // Retrive the data that is used to render a glyph of charecter 'ch'
+            // Retrive the data that is used to render a glyph of character 'ch'
             stbtt_packedchar* packedChar = &set.packedChars[ch - codePointOfFirstChar]; 
             stbtt_aligned_quad* alignedQuad = &set.alignedQuads[ch - codePointOfFirstChar];
             
@@ -246,35 +311,35 @@ void TextRenderer::initTextRenderingData(){
     // check opengl version
     if(GLAD_GL_VERSION_4_5){
         // configure VAO/VBO for text
-        glCreateVertexArrays(1, &VAO);
-        glCreateBuffers(1, &VBO);
+        glCreateVertexArrays(1, &textVAO);
+        glCreateBuffers(1, &textVBO);
         
-        glNamedBufferData(VBO, sizeof(CharacterVertex) * maxQuadVertexCount, nullptr, GL_DYNAMIC_DRAW);
+        glNamedBufferData(textVBO, sizeof(CharacterVertex) * maxQuadVertexCount, nullptr, GL_DYNAMIC_DRAW);
         
-        glVertexArrayVertexBuffer(VAO, 0, VBO, 0, sizeof(CharacterVertex));
+        glVertexArrayVertexBuffer(textVAO, 0, textVBO, 0, sizeof(CharacterVertex));
         
         // vertex attribute
-        glEnableVertexArrayAttrib(VAO, 0);
-        glVertexArrayAttribBinding(VAO, 0, 0);
-        glVertexArrayAttribFormat(VAO, 0, 3, GL_FLOAT, GL_FALSE, offsetof(CharacterVertex, position));
+        glEnableVertexArrayAttrib(textVAO, 0);
+        glVertexArrayAttribBinding(textVAO, 0, 0);
+        glVertexArrayAttribFormat(textVAO, 0, 3, GL_FLOAT, GL_FALSE, offsetof(CharacterVertex, position));
         
         // texture coordinates attribute
-        glEnableVertexArrayAttrib(VAO, 1);
-        glVertexArrayAttribBinding(VAO, 1, 0);
-        glVertexArrayAttribFormat(VAO,1, 2, GL_FLOAT, GL_FALSE, offsetof(CharacterVertex, texCoords));
+        glEnableVertexArrayAttrib(textVAO, 1);
+        glVertexArrayAttribBinding(textVAO, 1, 0);
+        glVertexArrayAttribFormat(textVAO,1, 2, GL_FLOAT, GL_FALSE, offsetof(CharacterVertex, texCoords));
         
         // color attribute
-        glEnableVertexArrayAttrib(VAO, 2);
-        glVertexArrayAttribBinding(VAO, 2, 0);
-        glVertexArrayAttribFormat(VAO,2, 4, GL_FLOAT, GL_FALSE, offsetof(CharacterVertex, color));
+        glEnableVertexArrayAttrib(textVAO, 2);
+        glVertexArrayAttribBinding(textVAO, 2, 0);
+        glVertexArrayAttribFormat(textVAO,2, 4, GL_FLOAT, GL_FALSE, offsetof(CharacterVertex, color));
     }else{
         // configure VAO/VBO for text
-        glGenVertexArrays(1, &VAO);        
-        glGenBuffers(1, &VBO);
+        glGenVertexArrays(1, &textVAO);        
+        glGenBuffers(1, &textVBO);
         
-        glBindVertexArray(VAO);
+        glBindVertexArray(textVAO);
         
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBindBuffer(GL_ARRAY_BUFFER, textVBO);
         glBufferData(GL_ARRAY_BUFFER, sizeof(CharacterVertex) * maxQuadVertexCount, NULL, GL_DYNAMIC_DRAW);
         
         // vertex attribute
@@ -288,9 +353,6 @@ void TextRenderer::initTextRenderingData(){
         // color attribute
         glEnableVertexAttribArray(3);
         glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(CharacterVertex), (const void *)offsetof(CharacterVertex, color));
-        
-        //glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);
     }
 }
 
@@ -313,10 +375,10 @@ bool TextRenderer::endCharacterBatch(){
     // check opengl version
     if(GLAD_GL_VERSION_4_5){
         // set up dynamic buffer
-        glNamedBufferSubData(VBO, 0, size, characterVertexBuffer);
+        glNamedBufferSubData(textVBO, 0, size, characterVertexBuffer);
     }else{
         // set up dynamic buffer
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBindBuffer(GL_ARRAY_BUFFER, textVBO);
         glBufferSubData(GL_ARRAY_BUFFER, 0, size, characterVertexBuffer);
     }
 
@@ -324,15 +386,15 @@ bool TextRenderer::endCharacterBatch(){
     return true;
 }
 
-void TextRenderer::clear(){
+void TextRenderer::clear(){    
     // delete all character vertex buffers
     delete[] characterVertexBuffer;
     characterVertexBufferPtr = nullptr;
     delete characterVertexBufferPtr;
     
     // delete quad buffer data 
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
+    glDeleteVertexArrays(1, &textVAO);
+    glDeleteBuffers(1, &textVBO);
 }
 
 void TextRenderer::setUpAutoClear(){

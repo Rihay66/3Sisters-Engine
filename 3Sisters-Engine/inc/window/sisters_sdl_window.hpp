@@ -50,12 +50,19 @@ class Window{
         // protected storage of SDL events
         SDL_Event eventHandle;
 
+        // track auto clear
+        bool isAutoClearSet = false;
+
+        // define cleaning functions
+        static void clear();
+        void setUpAutoClear();
+
     protected:
         // protected storage of window handle
-        SDL_Window* handle = nullptr;
+        static SDL_Window* handle;
 
         // protected storage of window context
-        SDL_GLContext context;
+        static SDL_GLContext context;
         
         // used to set the target frame time between frame, aka max frame time
         void setTargetTimeStep(double time);
