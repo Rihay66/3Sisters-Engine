@@ -23,3 +23,20 @@ Game Engine: 3Sisters
 * Tools/Libraries usage
 + SDL3 (input handling, audio, window management)
 + OpenGL & Emscripten (Copy most API from 3Sisters-Legacy)
+
+Main Features to work on:
+- Graphics/Input/Window/Audio handling (completely in C)
+- LUA engine
+- Live reloading LUA
+- Arguments handling on app
+- Emscripten
+- Project setup
+
+Things to do when base is done:
+* 
+
+Additional features after baseline done
+- Builtin pause menu
+- builtin meta data saving/loading
+- Tools
+- Plugins? (May need further looking into)

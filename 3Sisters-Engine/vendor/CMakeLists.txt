@@ -18,6 +18,12 @@ FetchContent_Declare(
     GIT_SHALLOW TRUE
 )
 
+FetchContent_Declare(
+    lua
+    GIT_REPOSITORY "https://github.com/marovira/lua"
+    GIT_TAG master
+)
+
 # Set CMAKE arguments
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 
@@ -27,4 +33,4 @@ set(SDL_STATIC ON CACHE BOOL "" FORCE)
 set(SDL_TEST_LIBRARY OFF CACHE BOOL "" FORCE)
 
 # Make dependencies available
-FetchContent_MakeAvailable(sdl)
+FetchContent_MakeAvailable(sdl lua)
